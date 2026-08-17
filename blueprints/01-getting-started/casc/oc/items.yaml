@@ -1,0 +1,50 @@
+removeStrategy:
+  rbac: UPDATE
+  items: NONE
+items:
+# TEST 1 - controller-a: hosts the item-scoped group that grants
+# sa-token-manager (Group/CreateToken) ONLY at this item's scope
+# (Scenario A). Also hosts its own item-scoped target SA so we can check
+# whether the item-scoped grant even works for its own intended controller.
+- kind: managedController
+  name: controller-a
+  displayName: controller-a
+  description: "TEST 1 (Ticket #277627) - isolation target A"
+  configuration:
+    kubernetes:
+      memory: 2048
+      cpus: 1.0
+      disk: 5
+  serviceAccounts:
+  - name: ca-target-sa
+    authentication: []
+  groups:
+  - name: controller-a-token-managers
+    description: >-
+      SCENARIO A: grants sa-token-manager ONLY at controller-a's item
+      scope. Per docs, Group/CreateToken is always checked at root scope,
+      so members here should NOT be able to create tokens for ANY service
+      account, including controller-a/ca-target-sa in this same item.
+    roles:
+    - name: sa-token-manager
+      grantedAt: current
+    members:
+      serviceAccounts:
+      - sa-scope-test-item
+
+# TEST 1 - controller-b: sibling controller with its own item-scoped
+# target SA. Used to check whether Scenario B's ROOT-granted
+# sa-token-manager (see rbac.yaml root-token-managers group) can reach
+# tokens on a controller it was never explicitly scoped to.
+- kind: managedController
+  name: controller-b
+  displayName: controller-b
+  description: "TEST 1 (Ticket #277627) - isolation target B (sibling of controller-a)"
+  configuration:
+    kubernetes:
+      memory: 2048
+      cpus: 1.0
+      disk: 5
+  serviceAccounts:
+  - name: cb-target-sa
+    authentication: []
