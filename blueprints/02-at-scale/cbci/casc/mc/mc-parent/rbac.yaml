@@ -92,6 +92,17 @@ groups:
   - name: administer
     grantedAt: current
   name: Administrators
+# TEST 3 SSO-relay follow-up: direct user grant for the real Entra ID
+# account, mirroring the OC's own entra-enduser-admins group. Managed
+# controllers have their OWN separate RBAC config (this file) -- the
+# OC's rbac.yaml grant does NOT propagate here automatically.
+- members:
+    users:
+    - holywen@hotmail.com
+  roles:
+  - name: administer
+    grantedAt: current
+  name: entra-enduser-admins
 - members:
     external_groups:
     - Dev_Team_X
