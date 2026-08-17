@@ -37,13 +37,6 @@ items:
         disk: 5
         nodeSelectors: topology.kubernetes.io/zone=${sec_awsRegion}a,role=cb-apps
         storageClassName: "gp3-a"
-    # TEST 1 (Ticket #277627): item-scoped target SA on a SIBLING controller,
-    # used to check whether Scenario B's ROOT-granted sa-token-manager (see
-    # rbac.yaml root-token-managers group) can reach tokens on a controller
-    # it was never explicitly scoped to.
-    serviceAccounts:
-    - name: cb-target-sa
-      authentication: []
         yaml: |-
           ---
           apiVersion: "apps/v1"
@@ -78,6 +71,13 @@ items:
     properties:
       - configurationAsCode:
           bundle: "${cascBranch}/mc-none-ha"
+    # TEST 1 (Ticket #277627): item-scoped target SA on a SIBLING controller,
+    # used to check whether Scenario B's ROOT-granted sa-token-manager (see
+    # rbac.yaml root-token-managers group) can reach tokens on a controller
+    # it was never explicitly scoped to.
+    serviceAccounts:
+    - name: cb-target-sa
+      authentication: []
   # Casc, HA
   - kind: managedController
     name: team-c-ha
