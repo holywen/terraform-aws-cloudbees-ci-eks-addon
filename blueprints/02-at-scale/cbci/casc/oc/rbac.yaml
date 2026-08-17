@@ -68,6 +68,15 @@ roles:
   - com.cloudbees.plugins.updatecenter.UpdateCenter.Promote
   name: administer
 - name: anonymous
+# TEST 1 (Ticket #277627 follow-up): minimum permission set for delegated,
+# non-admin service-account token lifecycle management, per
+# https://docs.cloudbees.com/docs/cloudbees-ci/latest/secure/service-accounts-security
+- filterable: false
+  permissions:
+  - hudson.model.Hudson.Read
+  - nectar.plugins.rbac.groups.Group.Manage
+  - nectar.plugins.rbac.groups.Group.CreateToken
+  name: sa-token-manager
 - filterable: true
   permissions:
   - hudson.model.Item.Cancel
@@ -97,6 +106,40 @@ roles:
   - hudson.model.Hudson.Read
   - hudson.model.View.Read
   name: browse
+# TEST 2 (Ticket #277728): Microsoft Entra ID (Azure AD) v2.0 issuer domain.
+serviceAccountOidcIssuerDomains:
+  - login.microsoftonline.com
+serviceAccounts:
+# TEST 1 / Scenario A actor: root-scoped SA whose ONLY grant of
+# sa-token-manager comes from a group at ITEM scope (team-a). Per docs,
+# Group/CreateToken is always checked at root scope, so this grant is
+# expected to have NO effect at all.
+- name: sa-scope-test-item
+  authentication:
+  - type: password
+    id: sa-scope-test-item-token
+    description: "TEST1 Scenario A actor token"
+    password: cloudbees_ci_sa_20007428430820cbc3b1102fb4049ff1
+# TEST 1 / Scenario B actor: root-scoped SA granted sa-token-manager via a
+# ROOT-scoped group (root-token-managers, below).
+- name: sa-scope-test-root
+  authentication:
+  - type: password
+    id: sa-scope-test-root-token
+    description: "TEST1 Scenario B actor token"
+    password: cloudbees_ci_sa_fd0f4c1acb2ab41bb79d039c4d8df8c1
+# TEST 1 target: root-scoped SA with no bundle-managed token.
+- name: root-target-sa
+  authentication: []
+# TEST 2: service account authenticating via Microsoft Entra ID OIDC.
+# Placeholders -- update once Entra ID app registration details are ready.
+- name: entra-oidc-sa
+  authentication:
+  - type: oidc
+    id: entra-id-oidc
+    issuer: "https://login.microsoftonline.com/REPLACE_WITH_TENANT_ID/v2.0"
+    subject: "REPLACE_WITH_SERVICE_PRINCIPAL_OBJECT_ID"
+    audience: "REPLACE_WITH_APP_ID_URI_OR_CLIENT_ID"
 groups:
 - members:
     external_groups:
@@ -114,3 +157,18 @@ groups:
     grantedAt: current
     propagates: false
   name: Developers
+# SCENARIO B control group: sa-token-manager granted at ROOT scope.
+- roles:
+  - name: sa-token-manager
+    grantedAt: current
+  members:
+    serviceAccounts:
+    - sa-scope-test-root
+  name: root-token-managers
+- roles:
+  - name: sa-token-manager
+    grantedAt: current
+  members:
+    serviceAccounts:
+    - entra-oidc-sa
+  name: entra-sa-group

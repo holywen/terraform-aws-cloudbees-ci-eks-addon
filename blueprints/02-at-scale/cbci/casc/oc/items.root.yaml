@@ -12,6 +12,21 @@ items:
         disk: 10
         nodeSelectors: topology.kubernetes.io/zone=${sec_awsRegion}a,role=cb-apps
         storageClassName: "gp3-a"
+    # TEST 1 (Ticket #277627): item-scoped target SA + a group that grants
+    # sa-token-manager (Group/CreateToken) ONLY at team-a's item scope
+    # (Scenario A). Per docs, this should have NO effect at all, even for
+    # ca-target-sa in this same item.
+    serviceAccounts:
+    - name: ca-target-sa
+      authentication: []
+    groups:
+    - name: team-a-token-managers
+      roles:
+      - name: sa-token-manager
+        grantedAt: current
+      members:
+        serviceAccounts:
+        - sa-scope-test-item
   # Casc, Non-HA
   - kind: managedController
     name: team-b
@@ -22,6 +37,13 @@ items:
         disk: 5
         nodeSelectors: topology.kubernetes.io/zone=${sec_awsRegion}a,role=cb-apps
         storageClassName: "gp3-a"
+    # TEST 1 (Ticket #277627): item-scoped target SA on a SIBLING controller,
+    # used to check whether Scenario B's ROOT-granted sa-token-manager (see
+    # rbac.yaml root-token-managers group) can reach tokens on a controller
+    # it was never explicitly scoped to.
+    serviceAccounts:
+    - name: cb-target-sa
+      authentication: []
         yaml: |-
           ---
           apiVersion: "apps/v1"

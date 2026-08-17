@@ -15,10 +15,10 @@ OperationsCenter:
     Enabled: true
     Retriever:
       Enabled: true
-      scmRepo: "https://github.com/cloudbees/terraform-aws-cloudbees-ci-eks-addon.git"
-      scmBranch: develop
+      scmRepo: "https://github.com/holywen/terraform-aws-cloudbees-ci-eks-addon.git"
+      scmBranch: keysight-casc-test
       scmBundlePath: blueprints/02-at-scale/cbci/casc/oc
-      scmPollingInterval: PT20M
+      scmPollingInterval: PT2M
 Persistence:
   StorageClass: efs
 Hibernation:

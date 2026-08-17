@@ -408,7 +408,10 @@ resource "aws_backup_selection" "efs_backup_selection" {
 }
 
 resource "aws_iam_role" "backup_role" {
-  name = "efs-backup-role"
+  # NOTE: upstream hardcodes this as "efs-backup-role" with no unique
+  # suffix, which collides with any other deployment's role of the same
+  # name in a shared AWS account (IAM role names are account-global).
+  name = "${local.name}-efs-backup-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
