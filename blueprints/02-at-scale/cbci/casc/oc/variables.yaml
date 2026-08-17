@@ -10,3 +10,9 @@ variables:
   - vault_url: "http://vault.vault.svc.cluster.local:8200"
   - cascSecretsName: "cbci-sec-casc"
   - s3bucketPreffix: "cbci"
+  # TEST 3: end-user OIDC login (oic-auth plugin), App Registration
+  # "cbci-keysight-enduser-oidc-test" in tenant holywenhotmail.onmicrosoft.com.
+  # Client secret lives in the cbci-sec-casc K8s Secret (sec_entraEndUserClientSecret),
+  # not committed here.
+  - entraEndUserClientId: "a40915fa-92ac-4c75-b050-217234aeccdf"
+  - entraTenantId: "97f9ccac-e200-42e0-b725-6e50e4d235b8"

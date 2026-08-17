@@ -152,6 +152,19 @@ groups:
   - name: administer
     grantedAt: current
   name: Administrators
+# TEST 3: end-user OIDC login (Ticket #277728 follow-up). Direct user grant
+# (not a group-claim mapping -- kept out of scope for this test, see
+# tickets/Test3_Results_EndUser_OIDC_EntraID.md) for the real Entra ID
+# account used to verify interactive login. userNameField is
+# "preferred_username", which for this personal-tenant account is the
+# account's email address.
+- members:
+    users:
+    - holywen@hotmail.com
+  roles:
+  - name: administer
+    grantedAt: current
+  name: entra-enduser-admins
 - members:
     external_groups:
     - Dev_Team_X

@@ -1,12 +1,31 @@
 jenkins:
   securityRealm:
-    ldap:
-      configurations:
-      - managerDN: ${ldapManagerDN}
-        managerPasswordSecret: ${sec_globalPassword}
-        rootDN: ${ldapRootDN}
-        server: ${ldapServer}
-        userSearch: ${ldapUserSearch}
+    # TEST 3 (Ticket #277728 follow-up): end-user OIDC login via Microsoft
+    # Entra ID (oic-auth plugin), replacing the LDAP realm below to
+    # empirically test CloudBees support's claim that end-user OIDC login
+    # is "not officially supported ... a platform level limitation".
+    # NOTE: securityRealm (authentication) and authorizationStrategy
+    # (authorization) are orthogonal -- no RBAC changes needed for this swap.
+    oic:
+      clientId: "${entraEndUserClientId}"
+      clientSecret: "${sec_entraEndUserClientSecret}"
+      serverConfiguration:
+        wellKnown:
+          wellKnownOpenIDConfigurationUrl: "https://login.microsoftonline.com/${entraTenantId}/v2.0/.well-known/openid-configuration"
+          scopesOverride: "openid profile email"
+      userNameField: "preferred_username"
+      fullNameFieldName: "name"
+      emailFieldName: "email"
+      logoutFromOpenidProvider: true
+  # Original LDAP realm (Test 1/Test 2 baseline), preserved here in a
+  # comment for a fast rollback if Test 3 needs to be reverted:
+  #   ldap:
+  #     configurations:
+  #     - managerDN: ${ldapManagerDN}
+  #       managerPasswordSecret: ${sec_globalPassword}
+  #       rootDN: ${ldapRootDN}
+  #       server: ${ldapServer}
+  #       userSearch: ${ldapUserSearch}
   authorizationStrategy: "cloudBeesRoleBasedAccessControl"
   remotingSecurity:
     enabled: true
