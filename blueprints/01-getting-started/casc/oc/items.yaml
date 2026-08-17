@@ -1,5 +1,5 @@
 removeStrategy:
-  rbac: UPDATE
+  rbac: SYNC
   items: NONE
 items:
 # TEST 1 - controller-a: hosts the item-scoped group that grants

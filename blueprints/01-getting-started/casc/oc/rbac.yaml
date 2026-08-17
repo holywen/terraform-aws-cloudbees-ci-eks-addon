@@ -1,5 +1,5 @@
 removeStrategy:
-  rbac: UPDATE
+  rbac: SYNC
 roles:
 - name: authenticated
 - name: anonymous
