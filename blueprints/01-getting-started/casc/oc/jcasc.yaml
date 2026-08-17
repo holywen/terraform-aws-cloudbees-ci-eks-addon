@@ -13,6 +13,3 @@ jenkins:
   authorizationStrategy: "cloudBeesRoleBasedAccessControl"
   remotingSecurity:
     enabled: true
-  crumbIssuer:
-    standard:
-      excludeClientIPFromCrumb: true
