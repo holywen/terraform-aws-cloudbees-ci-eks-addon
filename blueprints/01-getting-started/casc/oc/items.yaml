@@ -19,12 +19,11 @@ items:
   - name: ca-target-sa
     authentication: []
   groups:
+  # SCENARIO A: grants sa-token-manager ONLY at controller-a's item
+  # scope. Per docs, Group/CreateToken is always checked at root scope,
+  # so members here should NOT be able to create tokens for ANY service
+  # account, including controller-a/ca-target-sa in this same item.
   - name: controller-a-token-managers
-    description: >-
-      SCENARIO A: grants sa-token-manager ONLY at controller-a's item
-      scope. Per docs, Group/CreateToken is always checked at root scope,
-      so members here should NOT be able to create tokens for ANY service
-      account, including controller-a/ca-target-sa in this same item.
     roles:
     - name: sa-token-manager
       grantedAt: current
