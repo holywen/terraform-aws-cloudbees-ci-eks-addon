@@ -1,5 +1,5 @@
 apiVersion: "2"
-id: "oc"
+id: "oc-01-getting-started"
 description: "Keysight CasC/OIDC test bundle - Ticket #277627 (create-token scoping) and #277728 (OIDC with Microsoft Entra ID)"
 version: "6"
 jcasc:
