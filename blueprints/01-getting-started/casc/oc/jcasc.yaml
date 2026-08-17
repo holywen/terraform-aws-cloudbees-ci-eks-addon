@@ -1,0 +1,18 @@
+jenkins:
+  securityRealm:
+    local:
+      allowsSignup: false
+      enableCaptcha: false
+      users:
+      - id: "admin"
+        password: "cbci-test-admin-2026!"
+  # Activates the CloudBees RBAC plugin's authorization strategy so
+  # rbac.yaml (roles/groups/service accounts) is actually enforced.
+  # Without this, the OC boots with useSecurity=false and rbac.yaml has
+  # no effect at all.
+  authorizationStrategy: "cloudBeesRoleBasedAccessControl"
+  remotingSecurity:
+    enabled: true
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: true
