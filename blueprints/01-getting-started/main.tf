@@ -40,6 +40,34 @@ module "eks_blueprints_addon_cbci" {
   cert_arn      = module.acm.acm_certificate_arn
   trial_license = var.trial_license
 
+  # Keysight tickets #277627 (create-token RBAC scoping) and #277728 (OIDC
+  # w/ Microsoft Entra ID) test bundle, fetched from a branch on this fork.
+  # NOTE: the module's default pinned chart (3.28671.0 / app 2.516.1.28669)
+  # predates the CloudBees CI Service Accounts feature (RBAC serviceAccounts
+  # + serviceAccountOidcIssuerDomains), introduced in app 2.541.3.36065.
+  # Override to a chart version built on top of that release or later.
+  helm_config = {
+    version = "3.37665.0+4bc8a7ed09b1" # app 2.568.2.37664 - includes Service Accounts (introduced 2.541.3.36065)
+    values = [<<-EOT
+      OperationsCenter:
+        CasC:
+          Enabled: true
+          Retriever:
+            Enabled: true
+            scmRepo: "https://github.com/holywen/terraform-aws-cloudbees-ci-eks-addon.git"
+            scmBranch: keysight-casc-test
+            scmBundlePath: blueprints/01-getting-started/casc/oc-legacy
+            scmPollingInterval: PT2M
+      # Chart 3.28671.0 failed schema validation without this explicit
+      # override (Agents.SeparateNamespace.Enabled otherwise renders null).
+      # Kept in case the newer chart has the same default gap.
+      Agents:
+        SeparateNamespace:
+          Enabled: false
+    EOT
+    ]
+  }
+
 }
 
 # EKS Blueprints Add-ons
@@ -114,6 +142,11 @@ module "eks" {
   cluster_endpoint_public_access = true
   #vK8#
   cluster_version = "1.32"
+
+  # Without this, the IAM principal running terraform apply gets no EKS
+  # access entry, and any kubernetes/helm-provider resource in this same
+  # apply fails with "Unauthorized" right after cluster creation.
+  enable_cluster_creator_admin_permissions = true
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
