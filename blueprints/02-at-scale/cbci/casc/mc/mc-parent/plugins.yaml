@@ -23,6 +23,7 @@ plugins:
   - id: managed-master-hibernation
   - id: mock-load-builder
   - id: momentjs
+  - id: oic-auth
   - id: opentelemetry
   - id: operations-center-notification
   - id: pipeline-event-step
