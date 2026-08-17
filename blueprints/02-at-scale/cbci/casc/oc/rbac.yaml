@@ -134,14 +134,16 @@ serviceAccounts:
 - name: root-target-sa
   authentication: []
 # TEST 2: service account authenticating via Microsoft Entra ID OIDC.
-# Placeholders -- update once Entra ID app registration details are ready.
+# Real values from App Registration "cbci-keysight-oidc-test" in tenant
+# holywenhotmail.onmicrosoft.com (client-credentials flow, v2.0 tokens,
+# confirmed by minting and decoding a real token -- see Test 2 results doc).
 - name: entra-oidc-sa
   authentication:
   - type: oidc
     id: entra-id-oidc
-    issuer: "https://login.microsoftonline.com/REPLACE_WITH_TENANT_ID/v2.0"
-    subject: "REPLACE_WITH_SERVICE_PRINCIPAL_OBJECT_ID"
-    audience: "REPLACE_WITH_APP_ID_URI_OR_CLIENT_ID"
+    issuer: "https://login.microsoftonline.com/97f9ccac-e200-42e0-b725-6e50e4d235b8/v2.0"
+    subject: "80829c76-7168-4889-af8b-80570637964d"
+    audience: "bbd6d52f-32dc-467c-956b-807734dad4ba"
 groups:
 - members:
     external_groups:
