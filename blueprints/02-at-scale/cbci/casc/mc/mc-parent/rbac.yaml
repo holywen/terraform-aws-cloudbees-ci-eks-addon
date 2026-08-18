@@ -99,6 +99,7 @@ groups:
 - members:
     users:
     - holywen@hotmail.com
+    - mawuku@cloudbees.com
   roles:
   - name: administer
     grantedAt: current
