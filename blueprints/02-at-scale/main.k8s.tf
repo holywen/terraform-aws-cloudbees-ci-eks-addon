@@ -80,11 +80,12 @@ module "eks_blueprints_addon_cbci" {
 
   create_casc_secrets = true
   casc_secrets_file = templatefile("k8s/secrets-values.yml", {
-    global_password = local.global_password
-    s3bucketName    = module.cbci_s3_bucket.s3_bucket_id
-    awsRegion       = var.aws_region
-    adminMail       = var.trial_license["email"]
-    grafana_url     = local.grafana_url
+    global_password         = local.global_password
+    s3bucketName            = module.cbci_s3_bucket.s3_bucket_id
+    awsRegion               = var.aws_region
+    adminMail               = var.trial_license["email"]
+    grafana_url             = local.grafana_url
+    entraEndUserClientSecret = var.entra_enduser_client_secret
   })
 
   create_reg_secret = true

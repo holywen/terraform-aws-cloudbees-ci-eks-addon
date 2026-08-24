@@ -16,6 +16,12 @@ jenkins:
       userNameField: "preferred_username"
       fullNameFieldName: "name"
       emailFieldName: "email"
+      # TEST 3 follow-up: group-claim mapping. groupMembershipClaims=SecurityGroup
+      # is set on the "cbci-keysight-enduser-oidc-test" app registration so the
+      # ID token includes a top-level "groups" claim listing group OBJECT IDs
+      # (GUIDs) -- rbac.yaml's external_groups must match on the GUID, not the
+      # group's display name.
+      groupsFieldName: "groups"
       logoutFromOpenidProvider: true
   # Original LDAP realm (Test 1/Test 2 baseline), preserved here in a
   # comment for a fast rollback if Test 3 needs to be reverted:

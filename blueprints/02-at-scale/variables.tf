@@ -22,6 +22,16 @@ variable "dh_reg_secret_auth" {
   }
 }
 
+# TEST 3: end-user OIDC login (oic-auth plugin) client secret for the
+# "cbci-keysight-enduser-oidc-test" Entra ID App Registration. Real value
+# lives only in .auto.tfvars (gitignored), never committed here.
+variable "entra_enduser_client_secret" {
+  description = "Microsoft Entra ID client secret for the end-user OIDC (oic-auth) app registration, injected into the cbci-sec-casc K8s Secret as sec_entraEndUserClientSecret."
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
 ############
 # Optional
 ############

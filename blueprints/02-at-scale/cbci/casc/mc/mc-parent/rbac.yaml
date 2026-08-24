@@ -99,11 +99,24 @@ groups:
 - members:
     users:
     - holywen@hotmail.com
-    - mawuku@cloudbees.com
   roles:
   - name: administer
     grantedAt: current
   name: entra-enduser-admins
+# TEST 3 follow-up: group-claim mapping via SSO relay. mawuku@cloudbees.com's
+# direct grant above was removed and replaced by membership in the
+# "cbci-oidc-group-test" Entra ID security group (object id
+# 00b5feea-9a1d-4640-8f6a-8d0fb1d9303d), mirroring oc/rbac.yaml, to prove the
+# group claim also carries through the operationsCenter security-realm relay
+# to a managed controller. Matches on the group's OBJECT ID (GUID), not its
+# display name.
+- members:
+    external_groups:
+    - 00b5feea-9a1d-4640-8f6a-8d0fb1d9303d
+  roles:
+  - name: administer
+    grantedAt: current
+  name: entra-group-admins
 - members:
     external_groups:
     - Dev_Team_X
