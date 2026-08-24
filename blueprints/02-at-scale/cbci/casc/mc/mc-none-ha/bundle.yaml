@@ -1,11 +1,27 @@
 apiVersion: "2"
 id: "mc-none-ha"
 description: "CasC bundle for non-HA controllers. It is tested for the CloudBees CI blueprint add-on: At scale."
-version: "2"
+version: "3"
 parent: "mc-parent"
 allowCapExceptions: true
 jcascMergeStrategy: "errorOnConflict"
 jcasc:
   - jcasc.main.yaml
+# DIAGNOSTIC (see tickets/Secondary_Findings_Product_Bugs.md finding #6):
+# parent: mc-parent inheritance was NOT delivering mc-parent's plugins:/
+# items:/rbac: content to controllers using this bundle (team-a, team-d) --
+# confirmed via zero plugins/jobs/rbac on disk despite clean bundle
+# validation. These are local COPIES of mc-parent's files (not a
+# cross-bundle reference -- CasC bundle file lists resolve within the
+# declaring bundle's own directory), added here to test whether explicit,
+# non-inherited declaration succeeds where inheritance did not.
+plugins:
+  - plugins.yaml
+items:
+  - items.admin-folder.yaml
+  - items.squad_x-folder.yaml
+  - items.squad_y-folder.yaml
+rbac:
+  - rbac.yaml
 variables:
   - variables.yaml
