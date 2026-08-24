@@ -11,16 +11,24 @@ items:
         disk: 10
         nodeSelectors: topology.kubernetes.io/zone=${sec_awsRegion}a,role=cb-apps
         storageClassName: "gp3-a"
+    # ROOT CAUSE (confirmed live, see tickets/Secondary_Findings_Product_Bugs.md):
+    # relying on cloudBeesCasCServer.defaultBundle (oc/jcasc.main.yaml) instead
+    # of an explicit configurationAsCode.bundle property here means NO CasC
+    # content (plugins/jcasc/rbac/items) is ever pushed to this controller --
+    # confirmed by team-b/team-c-ha (which both set this explicitly) getting
+    # full content while team-a/team-d (which didn't) got none, on the SAME
+    # fresh deploy. Explicit property, matching team-b's mc-none-ha bundle.
+    properties:
+      - configurationAsCode:
+          bundle: "${cascBranch}/mc-none-ha"
   # TEST 4: fresh managed controller, provisioned to replace team-a as the
   # live verification target after team-a's item got stuck in a permanent
   # PROVISIONING_ERROR (its `resource` object was nulled via a "Force
   # Deprovision" UI action during troubleshooting, and CloudBees's own
   # provisioning code NPEs on getDomain() when resource is null instead of
   # rebuilding it -- a real product bug, not a CasC content problem; see
-  # tickets/Secondary_Findings_Product_Bugs.md). No explicit
-  # configurationAsCode.bundle property, so it resolves the same default
-  # (mc-none-ha, which itself has parent: mc-parent) that team-a used --
-  # same Squad_X folder + eks-oidc-sa group-claim RBAC applies here too.
+  # tickets/Secondary_Findings_Product_Bugs.md). Same Squad_X folder +
+  # eks-oidc-sa group-claim RBAC applies here too via mc-none-ha -> mc-parent.
   - kind: managedController
     name: team-d
     configuration:
@@ -30,6 +38,9 @@ items:
         disk: 10
         nodeSelectors: topology.kubernetes.io/zone=${sec_awsRegion}a,role=cb-apps
         storageClassName: "gp3-a"
+    properties:
+      - configurationAsCode:
+          bundle: "${cascBranch}/mc-none-ha"
   # Casc, Non-HA
   - kind: managedController
     name: team-b
