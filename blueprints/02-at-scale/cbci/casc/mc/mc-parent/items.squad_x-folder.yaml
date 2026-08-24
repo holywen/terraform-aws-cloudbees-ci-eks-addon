@@ -13,6 +13,13 @@ items:
   # minting and decoding a real projected token from a live pod in the
   # cluster (same methodology as TEST 2's Entra ID claim confirmation) --
   # see tickets/Test4_Results_K8sServiceAccount_OIDC_EKS.md.
+  # No explicit `audience` -- matching the docs' own K8s OIDC example
+  # (https://docs.cloudbees.com/docs/cloudbees-ci/latest/secure/service-accounts-casc#example-k8s-oidc),
+  # which also omits it. Per the docs this defaults the expected audience
+  # to the service account's own URL (e.g.
+  # "https://<host>/<item-path>/serviceAccounts/<name>/"); the K8s
+  # projected token requested for this SA must use that exact string as
+  # its audience for the default to actually validate.
   serviceAccounts:
   - name: eks-oidc-sa
     authentication:
@@ -20,7 +27,6 @@ items:
       id: eks-oidc-cbci-bp02-ksight
       issuer: "https://oidc.eks.us-west-2.amazonaws.com/id/88F19131B87F02D72B169AD60DEC6BDE"
       subject: "system:serviceaccount:cbci-sa-test:eks-oidc-sa"
-      audience: "cbci-service-account"
   groups:
   - members:
       external_groups:
