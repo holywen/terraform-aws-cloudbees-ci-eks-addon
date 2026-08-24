@@ -84,6 +84,14 @@ roles:
   - hudson.model.Hudson.Read
   - hudson.model.View.Read
   name: browse
+# TEST 4: EKS cluster (cbci-bp02-ksight) OIDC issuer domain, for a K8s
+# ServiceAccount-backed CloudBees CI service account (evaluating replacing
+# legacy IDP-user-tied Jenkins tokens with workload identity). The identity
+# itself is declared folder-scoped in items.squad_x-folder.yaml, not here --
+# this list is a global (bundle-wide) allow-list, independent of where any
+# individual serviceAccounts entry using it is scoped.
+serviceAccountOidcIssuerDomains:
+  - amazonaws.com
 groups:
 - members:
     external_groups:

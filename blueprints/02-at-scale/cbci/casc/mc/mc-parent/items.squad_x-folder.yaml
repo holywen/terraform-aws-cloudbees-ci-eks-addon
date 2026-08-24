@@ -5,6 +5,22 @@ items:
 - kind: folder
   name: Squad_X
   displayName: Squad_X
+  # TEST 4: K8s ServiceAccount (EKS OIDC, cluster cbci-bp02-ksight) identity,
+  # declared FOLDER-SCOPED (not root) -- evaluating this as a replacement for
+  # legacy Jenkins tokens tied to IDP-user accounts, with fine-grained RBAC
+  # confined to a single folder. subject is the real
+  # "system:serviceaccount:cbci-sa-test:eks-oidc-sa" claim, confirmed by
+  # minting and decoding a real projected token from a live pod in the
+  # cluster (same methodology as TEST 2's Entra ID claim confirmation) --
+  # see tickets/Test4_Results_K8sServiceAccount_OIDC_EKS.md.
+  serviceAccounts:
+  - name: eks-oidc-sa
+    authentication:
+    - type: oidc
+      id: eks-oidc-cbci-bp02-ksight
+      issuer: "https://oidc.eks.us-west-2.amazonaws.com/id/88F19131B87F02D72B169AD60DEC6BDE"
+      subject: "system:serviceaccount:cbci-sa-test:eks-oidc-sa"
+      audience: "cbci-service-account"
   groups:
   - members:
       external_groups:
@@ -13,3 +29,13 @@ items:
     - name: develop
       grantedAt: current
     name: Squad_X
+  # Grants the K8s SA identity the SAME role as human Dev_Team_X members,
+  # but ONLY within this folder -- it has no grant anywhere else on this
+  # controller (no root/administer, no Squad_Y access).
+  - members:
+      serviceAccounts:
+      - eks-oidc-sa
+    roles:
+    - name: develop
+      grantedAt: current
+    name: eks-oidc-squad-x-bot
