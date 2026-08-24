@@ -27,6 +27,25 @@ items:
       members:
         serviceAccounts:
         - sa-scope-test-item
+  # TEST 4: fresh managed controller, provisioned to replace team-a as the
+  # live verification target after team-a's item got stuck in a permanent
+  # PROVISIONING_ERROR (its `resource` object was nulled via a "Force
+  # Deprovision" UI action during troubleshooting, and CloudBees's own
+  # provisioning code NPEs on getDomain() when resource is null instead of
+  # rebuilding it -- a real product bug, not a CasC content problem; see
+  # tickets/Secondary_Findings_Product_Bugs.md). No explicit
+  # configurationAsCode.bundle property, so it resolves the same default
+  # (mc-none-ha, which itself has parent: mc-parent) that team-a used --
+  # same Squad_X folder + eks-oidc-sa group-claim RBAC applies here too.
+  - kind: managedController
+    name: team-d
+    configuration:
+      kubernetes:
+        memory: 2048
+        cpus: 1.0
+        disk: 10
+        nodeSelectors: topology.kubernetes.io/zone=${sec_awsRegion}a,role=cb-apps
+        storageClassName: "gp3-a"
   # Casc, Non-HA
   - kind: managedController
     name: team-b
