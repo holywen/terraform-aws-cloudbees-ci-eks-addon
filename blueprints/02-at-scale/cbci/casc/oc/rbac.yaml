@@ -161,6 +161,7 @@ groups:
 - members:
     users:
     - holywen@hotmail.com
+    - shaohua.wen@gmail.com
   roles:
   - name: administer
     grantedAt: current
