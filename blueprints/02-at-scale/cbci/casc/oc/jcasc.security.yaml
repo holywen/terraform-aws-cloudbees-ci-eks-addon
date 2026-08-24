@@ -23,15 +23,9 @@ jenkins:
       # group's display name.
       groupsFieldName: "groups"
       logoutFromOpenidProvider: true
-  # Original LDAP realm (Test 1/Test 2 baseline), preserved here in a
-  # comment for a fast rollback if Test 3 needs to be reverted:
-  #   ldap:
-  #     configurations:
-  #     - managerDN: ${ldapManagerDN}
-  #       managerPasswordSecret: ${sec_globalPassword}
-  #       rootDN: ${ldapRootDN}
-  #       server: ${ldapServer}
-  #       userSearch: ${ldapUserSearch}
+  # Rollback: the original realm was `ldap:` (managerDN/managerPasswordSecret/
+  # rootDN/server/userSearch from ${ldapManagerDN}/${sec_globalPassword}/
+  # ${ldapRootDN}/${ldapServer}/${ldapUserSearch}), replaced for TEST 3.
   authorizationStrategy: "cloudBeesRoleBasedAccessControl"
   remotingSecurity:
     enabled: true
