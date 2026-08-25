@@ -12,6 +12,14 @@ items:
         disk: 10
         nodeSelectors: topology.kubernetes.io/zone=${sec_awsRegion}a,role=cb-apps
         storageClassName: "gp3-a"
+    # Explicit bundle assignment (not just relying on cloudBeesCasCServer's
+    # defaultBundle) -- prior investigation found this at minimum makes the
+    # OC's own bundle validation succeed cleanly; see
+    # tickets/Secondary_Findings_Product_Bugs.md finding #6 for the fuller,
+    # still partly unresolved story around managed-controller CasC delivery.
+    properties:
+      - configurationAsCode:
+          bundle: "${cascBranch}/mc-none-ha"
   # Casc, Non-HA
   - kind: managedController
     name: team-b

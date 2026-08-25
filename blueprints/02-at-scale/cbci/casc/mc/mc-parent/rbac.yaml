@@ -84,6 +84,13 @@ roles:
   - hudson.model.Hudson.Read
   - hudson.model.View.Read
   name: browse
+# K8s ServiceAccount (EKS OIDC) evaluation: EKS cluster OIDC issuers use
+# this domain regardless of AWS account/region/cluster -- the actual
+# binding to one specific cluster comes from the exact issuer URL (which
+# includes the cluster's unique ID) set per service account below, not
+# from this domain allow-list.
+serviceAccountOidcIssuerDomains:
+  - amazonaws.com
 groups:
 - members:
     external_groups:
