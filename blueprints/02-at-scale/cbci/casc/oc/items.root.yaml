@@ -28,6 +28,11 @@ items:
           spec:
             template:
               spec:
+                tolerations:
+                - key: "dedicated"
+                  operator: "Equal"
+                  value: "cb-apps"
+                  effect: "NoSchedule"
                 volumes:
                 - name: cbci-secrets
                   secret:
