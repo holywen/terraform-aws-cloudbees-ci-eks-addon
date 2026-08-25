@@ -29,7 +29,7 @@ items:
     name: Squad_X
   - members:
       serviceAccounts:
-      - eks-oidc-sa
+      - Squad_X/eks-oidc-sa
     roles:
     - name: develop
       grantedAt: current
