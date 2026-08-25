@@ -15,5 +15,8 @@ kubectl:
     # upstream velero chart's own current default has since moved away from
     # bitnami/kubectl entirely, defaulting to the official image instead --
     # matching that here rather than fighting Bitnami's registry changes.
-    # No explicit tag: defaults to the cluster's own Kubernetes version.
     repository: registry.k8s.io/kubectl
+    # Chart's auto-derived tag (from KubeVersion) truncates to "1.32" (no
+    # "v", no patch), which registry.k8s.io doesn't publish -- real tags
+    # are "v1.32.13"-style. Pin explicitly to the cluster's actual version.
+    tag: v1.32.13
