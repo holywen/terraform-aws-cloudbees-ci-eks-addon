@@ -5,6 +5,24 @@ items:
 - kind: folder
   name: Squad_Y
   displayName: Squad_Y
+  # Test 2 follow-up (Ticket #277728): a folder-scoped service account
+  # authenticated via Microsoft Entra ID OIDC (client-credentials flow),
+  # to prove fine-grained RBAC at folder level -- Test 2 originally only
+  # proved this identity at ROOT scope. Real values from App Registration
+  # "cbci-keysight-oidc-test" in tenant holywenhotmail.onmicrosoft.com,
+  # confirmed by minting and decoding a real token (see Test2 results doc).
+  # The OC-level issuer allow-list (serviceAccountOidcIssuerDomains) lives
+  # only in oc/rbac.yaml -- see that file for why. Kept in its own folder
+  # (Squad_Y), separate from Test 4's eks-oidc-sa (Squad_X), so the two
+  # OIDC providers' scoping can be verified independently of each other.
+  serviceAccounts:
+  - name: entra-oidc-sa
+    authentication:
+    - type: oidc
+      id: entra-id-oidc
+      issuer: "https://login.microsoftonline.com/97f9ccac-e200-42e0-b725-6e50e4d235b8/v2.0"
+      subject: "80829c76-7168-4889-af8b-80570637964d"
+      audience: "bbd6d52f-32dc-467c-956b-807734dad4ba"
   groups:
   - members:
       external_groups:
@@ -13,3 +31,14 @@ items:
     - name: develop
       grantedAt: current
     name: Squad_Y
+  - members:
+      serviceAccounts:
+      # Item-scoped service accounts must be referenced by full path, even
+      # within the same folder's own groups block (see finding #9 in
+      # Secondary_Findings_Product_Bugs.md) -- the bare name passes schema
+      # validation but fails at CasC boot with a "does not exist" error.
+      - Squad_Y/entra-oidc-sa
+    roles:
+    - name: develop
+      grantedAt: current
+    name: entra-oidc-squad-y-bot

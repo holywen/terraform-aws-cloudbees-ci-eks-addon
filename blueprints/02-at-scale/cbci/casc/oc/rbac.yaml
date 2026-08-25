@@ -107,8 +107,16 @@ roles:
 # regardless of AWS account/region/cluster -- the actual binding to one
 # specific cluster comes from the exact issuer URL (including the
 # cluster's unique ID) set per service account, not from this allow-list.
+#
+# Test 2 follow-up: re-adding the Microsoft Entra ID (Azure AD) v2.0 issuer
+# domain alongside the EKS one, this time to prove out FOLDER-scoped RBAC
+# for an Entra-ID-authenticated service account (Test 2 originally only
+# proved root-scoped access -- see tickets/Test2_Results_Ticket_277728_OIDC_EntraID.md).
+# The folder-scoped identity itself (entra-oidc-sa) lives in
+# mc/mc-parent/items.squad_y-folder.yaml, not here, same pattern as eks-oidc-sa.
 serviceAccountOidcIssuerDomains:
   - amazonaws.com
+  - login.microsoftonline.com
 groups:
 - members:
     external_groups:
