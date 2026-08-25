@@ -5,6 +5,20 @@ items:
 - kind: folder
   name: Squad_X
   displayName: Squad_X
+  # K8s ServiceAccount (EKS OIDC) evaluation, Test 4: a folder-scoped service
+  # account identity authenticated via the EKS cluster's own OIDC issuer (no
+  # AWS IAM/IRSA involved -- the cluster's issuer is a standalone
+  # spec-compliant OIDC IdP). No explicit `audience` is set, matching
+  # CloudBees's own documented example (it defaults to the service account
+  # URL). The issuer allow-list (serviceAccountOidcIssuerDomains) lives only
+  # in oc/rbac.yaml -- see that file for why.
+  serviceAccounts:
+  - name: eks-oidc-sa
+    authentication:
+    - type: oidc
+      id: eks-oidc-cbci-bp02-ksight
+      issuer: "https://oidc.eks.us-west-2.amazonaws.com/id/C4FE5924CDB7C144DF3BBBC6A8B3F710"
+      subject: "system:serviceaccount:cbci-sa-test:eks-oidc-sa"
   groups:
   - members:
       external_groups:
@@ -13,3 +27,11 @@ items:
     - name: develop
       grantedAt: current
     name: Squad_X
+  - members:
+      serviceAccounts:
+      - eks-oidc-sa
+    roles:
+    - name: develop
+      grantedAt: current
+    name: eks-oidc-squad-x-bot
+
