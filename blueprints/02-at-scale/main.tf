@@ -408,7 +408,12 @@ resource "aws_backup_selection" "efs_backup_selection" {
 }
 
 resource "aws_iam_role" "backup_role" {
-  name = "efs-backup-role"
+  # NOT "efs-backup-role" -- that generic name collides account-wide with an
+  # unrelated, currently-in-use IAM role from a different team/region in
+  # this shared AWS account (created 2025-05-13, last used in eu-central-1).
+  # IAM role names are unique per-account regardless of region, so this
+  # must be namespaced per-deployment.
+  name = "efs-backup-role-${local.name}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"

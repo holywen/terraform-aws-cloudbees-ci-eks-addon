@@ -8,5 +8,7 @@ nodeSelector:
 
 kubectl:
   image:
-    #Issue #60
-    tag: 1.26.14-debian-11-r6
+    # Issue #60's original pin (1.26.14-debian-11-r6) no longer exists --
+    # Bitnami's 2025 registry policy change removed nearly all historical
+    # version tags from the free tier, leaving only "latest" pullable.
+    tag: latest
