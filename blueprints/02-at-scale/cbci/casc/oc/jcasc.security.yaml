@@ -10,9 +10,14 @@ jenkins:
   authorizationStrategy: "cloudBeesRoleBasedAccessControl"
   remotingSecurity:
     enabled: true
-  crumbIssuer:
-    standard:
-      excludeClientIPFromCrumb: true
+  # excludeClientIPFromCrumb was removed from hudson.security.csrf.DefaultCrumbIssuer
+  # in the newer Jenkins core shipped by CloudBees CI 2.568.2.37664 (this bundle
+  # previously targeted 2.516.1.28669, pinned by a stale Terraform module default --
+  # see main.k8s.tf). Its removal is a CSRF-hardening change upstream, not a
+  # regression: dropping it just means crumbs are no longer weakened by excluding
+  # the client IP, which is the safer default anyway. Leaving crumbIssuer unset
+  # entirely (rather than an empty `standard: {}`) uses Jenkins' own default
+  # crumb issuer.
 globalCredentialsConfiguration:
   vaultGlobalConfiguration:
     authentications:

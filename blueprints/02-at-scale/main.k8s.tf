@@ -66,6 +66,19 @@ module "eks_blueprints_addon_cbci" {
   trial_license = var.trial_license
 
   helm_config = {
+    # The eks_blueprints_addon_cbci Terraform module (registry version 3.28671.0,
+    # itself the latest module version published -- confirmed via the Terraform
+    # Registry API) hardcodes an internal default chart version
+    # (3.28671.0+c09c0c4c48df, app 2.516.1.28669) that lags far behind the
+    # latest chart actually published in CloudBees's own Helm repo. Left
+    # unset, every deploy in this environment silently installed that stale,
+    # much older CloudBees CI release -- which does not support the
+    # serviceAccountOidcIssuerDomains CasC schema property added in later
+    # releases, causing the OC's own bundle to fail schema validation. Pin
+    # explicitly to the actual latest chart (confirmed via
+    # `helm search repo cloudbees/cloudbees-core --versions`) so this
+    # environment matches "latest CloudBees CI version" as intended.
+    version = "3.37665.0+4bc8a7ed09b1"
     values = [templatefile("k8s/cbci-values.yml", {
       cbciAppsNodeRole        = local.mng["cbci_apps"]["labels"].role
       cbciAppsTolerationKey   = local.mng["cbci_apps"]["taints"].key
