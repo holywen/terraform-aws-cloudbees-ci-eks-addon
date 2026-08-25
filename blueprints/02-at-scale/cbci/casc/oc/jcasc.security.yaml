@@ -1,34 +1,18 @@
 jenkins:
   securityRealm:
-    # TEST 3 (Ticket #277728 follow-up): end-user OIDC login via Microsoft
-    # Entra ID (oic-auth plugin), replacing the LDAP realm below to
-    # empirically test CloudBees support's claim that end-user OIDC login
-    # is "not officially supported ... a platform level limitation".
-    # NOTE: securityRealm (authentication) and authorizationStrategy
-    # (authorization) are orthogonal -- no RBAC changes needed for this swap.
-    oic:
-      clientId: "${entraEndUserClientId}"
-      clientSecret: "${sec_entraEndUserClientSecret}"
-      serverConfiguration:
-        wellKnown:
-          wellKnownOpenIDConfigurationUrl: "https://login.microsoftonline.com/${entraTenantId}/v2.0/.well-known/openid-configuration"
-          scopesOverride: "openid profile email"
-      userNameField: "preferred_username"
-      fullNameFieldName: "name"
-      emailFieldName: "email"
-      # TEST 3 follow-up: group-claim mapping. groupMembershipClaims=SecurityGroup
-      # is set on the "cbci-keysight-enduser-oidc-test" app registration so the
-      # ID token includes a top-level "groups" claim listing group OBJECT IDs
-      # (GUIDs) -- rbac.yaml's external_groups must match on the GUID, not the
-      # group's display name.
-      groupsFieldName: "groups"
-      logoutFromOpenidProvider: true
-  # Rollback: the original realm was `ldap:` (managerDN/managerPasswordSecret/
-  # rootDN/server/userSearch from ${ldapManagerDN}/${sec_globalPassword}/
-  # ${ldapRootDN}/${ldapServer}/${ldapUserSearch}), replaced for TEST 3.
+    ldap:
+      configurations:
+      - managerDN: ${ldapManagerDN}
+        managerPasswordSecret: ${sec_globalPassword}
+        rootDN: ${ldapRootDN}
+        server: ${ldapServer}
+        userSearch: ${ldapUserSearch}
   authorizationStrategy: "cloudBeesRoleBasedAccessControl"
   remotingSecurity:
     enabled: true
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: true
 globalCredentialsConfiguration:
   vaultGlobalConfiguration:
     authentications:

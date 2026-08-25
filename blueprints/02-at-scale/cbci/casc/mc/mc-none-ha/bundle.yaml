@@ -1,24 +1,11 @@
 apiVersion: "2"
 id: "mc-none-ha"
 description: "CasC bundle for non-HA controllers. It is tested for the CloudBees CI blueprint add-on: At scale."
-version: "4"
+version: "1"
 parent: "mc-parent"
 allowCapExceptions: true
 jcascMergeStrategy: "errorOnConflict"
 jcasc:
   - jcasc.main.yaml
-# DIAGNOSTIC v2 (see tickets/Secondary_Findings_Product_Bugs.md finding #6):
-# v3 (identical filenames to mc-parent's own files) still showed zero effect
-# in the OC's own effective-config computation. Renamed to unique filenames
-# (mcnoneha-*) to test finding #3's already-documented same-filename
-# collision pattern across bundles during consolidation.
-plugins:
-  - mcnoneha-plugins.yaml
-items:
-  - mcnoneha-items.admin-folder.yaml
-  - mcnoneha-items.squad_x-folder.yaml
-  - mcnoneha-items.squad_y-folder.yaml
-rbac:
-  - mcnoneha-rbac.yaml
 variables:
   - variables.yaml

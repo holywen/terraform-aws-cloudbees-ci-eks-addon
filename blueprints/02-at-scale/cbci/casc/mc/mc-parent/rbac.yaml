@@ -84,14 +84,6 @@ roles:
   - hudson.model.Hudson.Read
   - hudson.model.View.Read
   name: browse
-# TEST 4: EKS cluster (cbci-bp02-ksight) OIDC issuer domain, for a K8s
-# ServiceAccount-backed CloudBees CI service account (evaluating replacing
-# legacy IDP-user-tied Jenkins tokens with workload identity). The identity
-# itself is declared folder-scoped in items.squad_x-folder.yaml, not here --
-# this list is a global (bundle-wide) allow-list, independent of where any
-# individual serviceAccounts entry using it is scoped.
-serviceAccountOidcIssuerDomains:
-  - amazonaws.com
 groups:
 - members:
     external_groups:
@@ -100,31 +92,6 @@ groups:
   - name: administer
     grantedAt: current
   name: Administrators
-# TEST 3 SSO-relay follow-up: direct user grant for the real Entra ID
-# account, mirroring the OC's own entra-enduser-admins group. Managed
-# controllers have their OWN separate RBAC config (this file) -- the
-# OC's rbac.yaml grant does NOT propagate here automatically.
-- members:
-    users:
-    - holywen@hotmail.com
-  roles:
-  - name: administer
-    grantedAt: current
-  name: entra-enduser-admins
-# TEST 3 follow-up: group-claim mapping via SSO relay. mawuku@cloudbees.com
-# and shaohua.wen@gmail.com have NO direct grant -- their access depends
-# solely on membership in the "cbci-oidc-group-test" Entra ID security
-# group (object id 00b5feea-9a1d-4640-8f6a-8d0fb1d9303d), mirroring
-# oc/rbac.yaml, to prove the group claim also carries through the
-# operationsCenter security-realm relay to a managed controller. Matches
-# on the group's OBJECT ID (GUID), not its display name.
-- members:
-    external_groups:
-    - 00b5feea-9a1d-4640-8f6a-8d0fb1d9303d
-  roles:
-  - name: administer
-    grantedAt: current
-  name: entra-group-admins
 - members:
     external_groups:
     - Dev_Team_X

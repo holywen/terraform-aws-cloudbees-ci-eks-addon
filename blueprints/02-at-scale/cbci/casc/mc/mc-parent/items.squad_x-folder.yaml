@@ -5,28 +5,6 @@ items:
 - kind: folder
   name: Squad_X
   displayName: Squad_X
-  # TEST 4: K8s ServiceAccount (EKS OIDC, cluster cbci-bp02-ksight) identity,
-  # declared FOLDER-SCOPED (not root) -- evaluating this as a replacement for
-  # legacy Jenkins tokens tied to IDP-user accounts, with fine-grained RBAC
-  # confined to a single folder. subject is the real
-  # "system:serviceaccount:cbci-sa-test:eks-oidc-sa" claim, confirmed by
-  # minting and decoding a real projected token from a live pod in the
-  # cluster (same methodology as TEST 2's Entra ID claim confirmation) --
-  # see tickets/Test4_Results_K8sServiceAccount_OIDC_EKS.md.
-  # No explicit `audience` -- matching the docs' own K8s OIDC example
-  # (https://docs.cloudbees.com/docs/cloudbees-ci/latest/secure/service-accounts-casc#example-k8s-oidc),
-  # which also omits it. Per the docs this defaults the expected audience
-  # to the service account's own URL (e.g.
-  # "https://<host>/<item-path>/serviceAccounts/<name>/"); the K8s
-  # projected token requested for this SA must use that exact string as
-  # its audience for the default to actually validate.
-  serviceAccounts:
-  - name: eks-oidc-sa
-    authentication:
-    - type: oidc
-      id: eks-oidc-cbci-bp02-ksight
-      issuer: "https://oidc.eks.us-west-2.amazonaws.com/id/88F19131B87F02D72B169AD60DEC6BDE"
-      subject: "system:serviceaccount:cbci-sa-test:eks-oidc-sa"
   groups:
   - members:
       external_groups:
@@ -35,13 +13,3 @@ items:
     - name: develop
       grantedAt: current
     name: Squad_X
-  # Grants the K8s SA identity the SAME role as human Dev_Team_X members,
-  # but ONLY within this folder -- it has no grant anywhere else on this
-  # controller (no root/administer, no Squad_Y access).
-  - members:
-      serviceAccounts:
-      - eks-oidc-sa
-    roles:
-    - name: develop
-      grantedAt: current
-    name: eks-oidc-squad-x-bot

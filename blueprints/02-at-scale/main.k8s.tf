@@ -66,10 +66,6 @@ module "eks_blueprints_addon_cbci" {
   trial_license = var.trial_license
 
   helm_config = {
-    # Default pinned chart (3.28671.0 / app 2.516.1.28669) predates the
-    # CloudBees CI Service Accounts feature (RBAC serviceAccounts +
-    # serviceAccountOidcIssuerDomains), introduced in app 2.541.3.36065.
-    version = "3.37665.0+4bc8a7ed09b1" # app 2.568.2.37664
     values = [templatefile("k8s/cbci-values.yml", {
       cbciAppsNodeRole        = local.mng["cbci_apps"]["labels"].role
       cbciAppsTolerationKey   = local.mng["cbci_apps"]["taints"].key
@@ -80,12 +76,11 @@ module "eks_blueprints_addon_cbci" {
 
   create_casc_secrets = true
   casc_secrets_file = templatefile("k8s/secrets-values.yml", {
-    global_password         = local.global_password
-    s3bucketName            = module.cbci_s3_bucket.s3_bucket_id
-    awsRegion               = var.aws_region
-    adminMail               = var.trial_license["email"]
-    grafana_url             = local.grafana_url
-    entraEndUserClientSecret = var.entra_enduser_client_secret
+    global_password = local.global_password
+    s3bucketName    = module.cbci_s3_bucket.s3_bucket_id
+    awsRegion       = var.aws_region
+    adminMail       = var.trial_license["email"]
+    grafana_url     = local.grafana_url
   })
 
   create_reg_secret = true
@@ -199,10 +194,7 @@ module "eks_blueprints_addons" {
   cluster_autoscaler = {
     values = [file("k8s/cluster-autoscaler-values.yml")]
   }
-  # Disabled: the shipped chart pins a bitnami/kubectl tag Bitnami removed
-  # from Docker Hub during their 2025 image migration (pre-install hook
-  # ImagePullBackOff). Not needed for RBAC/OIDC service-account testing.
-  enable_velero = false
+  enable_velero = true
   velero = {
     values             = [file("k8s/velero-values.yml")]
     s3_backup_location = local.velero_s3_location

@@ -22,5 +22,3 @@ dh_reg_secret_auth = { # Required.
 # suffix = my-demo #Optional
 
 # aws_region = "us-west-2" #Optional
-
-# entra_enduser_client_secret = "changeme" # Optional. Microsoft Entra ID client secret for the end-user OIDC (oic-auth) app registration used by TEST 3. Only needed if that CasC bundle content is enabled.

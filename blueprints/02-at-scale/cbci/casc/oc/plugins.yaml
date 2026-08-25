@@ -8,6 +8,5 @@ plugins:
   - id: github
   - id: jsch
   - id: ldap
-  - id: oic-auth
   - id: popper2-api
   - id: sshd
