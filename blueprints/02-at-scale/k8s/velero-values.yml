@@ -8,7 +8,12 @@ nodeSelector:
 
 kubectl:
   image:
-    # Issue #60's original pin (1.26.14-debian-11-r6) no longer exists --
-    # Bitnami's 2025 registry policy change removed nearly all historical
-    # version tags from the free tier, leaving only "latest" pullable.
-    tag: latest
+    # Issue #60's original pin (bitnami/kubectl:1.26.14-debian-11-r6) is
+    # unusable now: Bitnami's 2025 registry policy change removed nearly all
+    # historical version tags from the free tier, and their "latest" tag is
+    # a different, incompatible base image (missing libreadline.so.8). The
+    # upstream velero chart's own current default has since moved away from
+    # bitnami/kubectl entirely, defaulting to the official image instead --
+    # matching that here rather than fighting Bitnami's registry changes.
+    # No explicit tag: defaults to the cluster's own Kubernetes version.
+    repository: registry.k8s.io/kubectl
