@@ -1,6 +1,6 @@
 apiVersion: "2"
 id: "oc"
-version: "5"
+version: "6"
 jcasc:
   - jcasc.main.yaml
   - jcasc.security.yaml

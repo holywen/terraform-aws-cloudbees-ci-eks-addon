@@ -12,6 +12,35 @@ items:
         disk: 10
         nodeSelectors: topology.kubernetes.io/zone=${sec_awsRegion}a,role=cb-apps
         storageClassName: "gp3-a"
+        # Mount the shared secrets volume (team-b/team-c-ha already had this;
+        # team-a was missing it). Without it, sec_-prefixed CasC secret
+        # variables (e.g. sec_adminMail, used by mc-parent's jcasc.support.yaml
+        # advisor block) resolve to an empty string for this controller only,
+        # via i.j.p.c.SecretSourceResolver$UnresolvedLookup. That was silently
+        # tolerated by the older CBCI release this environment was previously
+        # (accidentally) pinned to, but CloudBees Jenkins Advisor's email
+        # validation in the current release hard-fails CasC boot on an empty
+        # email -- surfaced only after fixing the Helm chart version pin.
+        yaml: |-
+          ---
+          apiVersion: "apps/v1"
+          kind: "StatefulSet"
+          spec:
+            template:
+              spec:
+                volumes:
+                - name: cbci-secrets
+                  secret:
+                    secretName: ${cascSecretsName}
+                containers:
+                - name: jenkins
+                  env:
+                  - name: SECRETS
+                    value: "/var/run/secrets/cbci"
+                  volumeMounts:
+                  - name: cbci-secrets
+                    mountPath: "/var/run/secrets/cbci"
+                    readOnly: true
     # Explicit bundle assignment (not just relying on cloudBeesCasCServer's
     # defaultBundle) -- prior investigation found this at minimum makes the
     # OC's own bundle validation succeed cleanly; see
