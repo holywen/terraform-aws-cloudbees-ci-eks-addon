@@ -97,6 +97,18 @@ roles:
   - hudson.model.Hudson.Read
   - hudson.model.View.Read
   name: browse
+# K8s ServiceAccount (EKS OIDC) evaluation. serviceAccountOidcIssuerDomains
+# is ONLY valid in the Operations Center's own rbac.yaml (confirmed via
+# CloudBees docs after this exact property, mistakenly added to
+# mc-parent/rbac.yaml, caused a schema validation error that cascaded into
+# the ENTIRE mc-parent/mc-none-ha bundle chain failing validation for every
+# managed controller -- see tickets/Secondary_Findings_Product_Bugs.md
+# finding #6 for the full story). EKS cluster OIDC issuers use this domain
+# regardless of AWS account/region/cluster -- the actual binding to one
+# specific cluster comes from the exact issuer URL (including the
+# cluster's unique ID) set per service account, not from this allow-list.
+serviceAccountOidcIssuerDomains:
+  - amazonaws.com
 groups:
 - members:
     external_groups:
