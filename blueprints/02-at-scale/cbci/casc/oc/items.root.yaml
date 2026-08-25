@@ -65,51 +65,20 @@ items:
       - configurationAsCode:
           bundle: "${cascBranch}/mc-none-ha"
   # Casc, HA
-  - kind: managedController
-    name: team-c-ha
-    configuration:
-      kubernetes:
-        memory: 6144
-        cpus: 2.0
-        disk: 5
-        nodeSelectors: role=cb-apps
-        storageClassName: "efs"
-        replication:
-          config:
-            maxReplicas: 4
-            replicas: 2
-            targetCPUUtilizationPercentage: 50
-        yaml: |-
-          ---
-          apiVersion: "apps/v1"
-          kind: "Deployment"
-          spec:
-            template:
-              spec:
-                tolerations:
-                - key: "dedicated"
-                  operator: "Equal"
-                  value: "cb-apps"
-                  effect: "NoSchedule"
-                volumes:
-                - name: cbci-secrets
-                  secret:
-                    secretName: ${cascSecretsName}
-                containers:
-                - name: jenkins
-                  env:
-                  - name: SECRETS
-                    value: "/var/run/secrets/cbci"
-                  volumeMounts:
-                  - name: cbci-secrets
-                    mountPath: "/var/run/secrets/cbci"
-                    readOnly: true
-          ---
-          apiVersion: "v1"
-          kind: "Service"
-          metadata:
-            labels:
-              "cloudbees.prometheus": "true"
-    properties:
-      - configurationAsCode:
-          bundle: "${cascBranch}/mc-ha"
+  # team-c-ha REMOVED (isolated) from this bundle: a genuine CloudBees product
+  # bug in the master-provisioning-kubernetes plugin's HPA reconciliation
+  # (com.cloudbees.masterprovisioning.kubernetes.Replication.rollingUpgrade)
+  # sends a server-side-apply PATCH for team-c-ha's HorizontalPodAutoscaler
+  # that omits spec.scaleTargetRef.name (a required, non-nullable field) --
+  # this is caused by team-c-ha's `configuration.kubernetes.replication.config`
+  # (maxReplicas/replicas/targetCPUUtilizationPercentage) CasC autoscaling
+  # feature, reproduced even against a pre-existing, correctly-configured HPA
+  # object. The resulting HTTP 422 throws INSIDE the single batch loop that
+  # rolls every managed controller onto a new image after a CBCI version
+  # bump, aborting the ENTIRE batch before it reaches team-a/team-b -- i.e.
+  # one HA controller's broken autoscaling config silently blocks every other
+  # managed controller's upgrade. See tickets/Secondary_Findings_Product_Bugs.md
+  # for the full writeup. Isolated here (removed from the OC's own bundle,
+  # matching the isolation approach already used earlier in this
+  # investigation) since team-c-ha is not in scope for the Test 4 EKS
+  # ServiceAccount OIDC evaluation, which targets team-a/Squad_X.
