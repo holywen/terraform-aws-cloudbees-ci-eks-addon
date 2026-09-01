@@ -1,0 +1,110 @@
+removeStrategy:
+  rbac: SYNC
+  items: NONE
+items:
+- kind: folder
+  name: mcp-demo
+  description: 'Synthetic pipelines for the CBCI MCP Server evaluation demo (see
+    tickets/Demo_Runbook_MCP_Server_Evaluation.md). Reproducible pass/fail/flaky
+    outcomes on purpose, for exercising triggerBuild/getBuildLog/searchBuildLog/getTestResults/getFlakyFailures
+    via the MCP router -- not a real application.'
+  displayName: mcp-demo
+  items:
+  - kind: pipeline
+    name: mcp-demo-pipeline
+    concurrentBuild: true
+    definition:
+      cpsFlowDefinition:
+        sandbox: true
+        script: |-
+          pipeline {
+            options {
+              timeout(time: 15, unit: 'MINUTES')
+            }
+            agent {
+              label 'linux-mavenAndKaniko-L'
+            }
+            parameters {
+              booleanParam(name: 'SHOULD_FAIL', defaultValue: false, description: 'Force this build to fail with a realistic-looking error, for MCP root-cause-analysis demo purposes')
+              booleanParam(name: 'FLAKY', defaultValue: false, description: 'Fail one JUnit test case on even build numbers only, to demo getFlakyFailures/getTestResults')
+            }
+            stages {
+              stage('Checkout') {
+                steps {
+                  container('maven') {
+                    sh 'echo "Simulating checkout of demo-app@main"'
+                  }
+                }
+              }
+              stage('Build') {
+                steps {
+                  container('maven') {
+                    sh 'echo "Building demo-app... compiling 42 source files"'
+                  }
+                }
+              }
+              stage('Test') {
+                steps {
+                  container('maven') {
+                    script {
+                      def flakyFail = params.FLAKY && (env.BUILD_NUMBER as Integer) % 2 == 0
+                      def failureBlock = flakyFail ? '<failure message="Connection reset by peer">java.net.SocketException: Connection reset by peer at com.example.demo.DbClient.connect(DbClient.java:42)</failure>' : ''
+                      writeFile file: 'test-results/results.xml', text: """<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+          <testsuite name=\"com.example.demo.DemoSuite\" tests=\"3\" failures=\"${flakyFail ? 1 : 0}\" errors=\"0\" skipped=\"0\">
+            <testcase classname=\"com.example.demo.DemoSuite\" name=\"testAddition\" time=\"0.01\"/>
+            <testcase classname=\"com.example.demo.DemoSuite\" name=\"testStringUtils\" time=\"0.02\"/>
+            <testcase classname=\"com.example.demo.DemoSuite\" name=\"testDatabaseConnection\" time=\"0.15\">${failureBlock}</testcase>
+          </testsuite>
+          """
+                    }
+                  }
+                }
+                post {
+                  always {
+                    junit 'test-results/results.xml'
+                  }
+                }
+              }
+              stage('Package') {
+                when {
+                  expression { !params.SHOULD_FAIL }
+                }
+                steps {
+                  container('maven') {
+                    sh 'echo "Packaged demo-app-1.0.0.jar" > demo-app-build-info.txt'
+                    archiveArtifacts artifacts: 'demo-app-build-info.txt', fingerprint: true
+                  }
+                }
+              }
+              stage('Deploy check') {
+                when {
+                  expression { params.SHOULD_FAIL }
+                }
+                steps {
+                  container('maven') {
+                    sh '''
+                      echo "Connecting to staging environment..."
+                      echo "ERROR: Connection timeout while reaching artifact-registry.internal:5000 after 30000ms"
+                      echo "ERROR: Failed to push image demo-app:${BUILD_NUMBER} - registry unreachable"
+                      exit 1
+                    '''
+                  }
+                }
+              }
+            }
+          }
+    description: 'MCP demo pipeline: pass by default, or force a realistic failure
+      (SHOULD_FAIL) / flaky test (FLAKY) for RCA and remediation demos via the CBCI
+      MCP router.'
+    displayName: mcp-demo-pipeline
+    properties:
+    - parameters:
+        parameterDefinitions:
+        - boolean:
+            name: SHOULD_FAIL
+            defaultValue: false
+            description: 'Force this build to fail with a realistic-looking error, for MCP root-cause-analysis demo purposes'
+        - boolean:
+            name: FLAKY
+            defaultValue: false
+            description: 'Fail one JUnit test case on even build numbers only, to demo getFlakyFailures/getTestResults'
