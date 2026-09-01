@@ -8,5 +8,6 @@ plugins:
   - id: github
   - id: jsch
   - id: ldap
+  - id: mcp-server
   - id: popper2-api
   - id: sshd

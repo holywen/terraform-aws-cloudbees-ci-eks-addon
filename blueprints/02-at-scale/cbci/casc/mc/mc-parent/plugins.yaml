@@ -21,6 +21,7 @@ plugins:
   - id: junit
   - id: ldap
   - id: managed-master-hibernation
+  - id: mcp-server
   - id: mock-load-builder
   - id: momentjs
   - id: opentelemetry
