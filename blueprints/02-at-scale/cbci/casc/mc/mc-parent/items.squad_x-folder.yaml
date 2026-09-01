@@ -17,7 +17,7 @@ items:
     authentication:
     - type: oidc
       id: eks-oidc-cbci-bp02-ksight
-      issuer: "https://oidc.eks.us-west-2.amazonaws.com/id/F5DCA387CDA94555D5F4D3607E85E1B4"
+      issuer: "https://oidc.eks.us-west-2.amazonaws.com/id/025702CE033D35FA8F67E6D3984F0ACF"
       subject: "system:serviceaccount:cbci-sa-test:eks-oidc-sa"
   groups:
   - members:
