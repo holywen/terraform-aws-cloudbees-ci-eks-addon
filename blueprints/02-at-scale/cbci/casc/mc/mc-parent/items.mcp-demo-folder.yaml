@@ -100,11 +100,11 @@ items:
     properties:
     - parameters:
         parameterDefinitions:
-        - boolean:
+        - booleanParam:
             name: SHOULD_FAIL
             defaultValue: false
             description: 'Force this build to fail with a realistic-looking error, for MCP root-cause-analysis demo purposes'
-        - boolean:
+        - booleanParam:
             name: FLAKY
             defaultValue: false
             description: 'Fail one JUnit test case on even build numbers only, to demo getFlakyFailures/getTestResults'
