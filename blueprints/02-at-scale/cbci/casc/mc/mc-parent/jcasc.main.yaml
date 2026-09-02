@@ -12,6 +12,12 @@ appearance:
     providers:
     - "cloudbeesPipelineExplorer"
 unclassified:
+  bundleUpdateTiming:
+    automaticReload: true
+    automaticRestart: false
+    rejectWarnings: false
+    reloadAlwaysOnRestart: false
+    skipNewVersions: false
   timestamper:
     allPipelines: true
   buildDiscarders:
