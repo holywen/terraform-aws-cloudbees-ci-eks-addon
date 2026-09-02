@@ -1,7 +1,7 @@
 apiVersion: "2"
 id: "mc-parent"
 description: "Parent CasC bundle. It is tested for the CloudBees CI blueprint add-on: At scale."
-version: "11"
+version: "12"
 jcasc:
   - jcasc.main.yaml
   - jcasc.support.yaml

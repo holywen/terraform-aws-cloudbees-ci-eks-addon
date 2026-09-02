@@ -11,6 +11,25 @@ items:
   displayName: mcp-demo
   items:
   - kind: pipeline
+    name: hello-cli-reload
+    concurrentBuild: true
+    definition:
+      cpsFlowDefinition:
+        sandbox: true
+        script: |-
+          pipeline {
+            agent none
+            stages {
+              stage('Hello') {
+                steps {
+                  echo 'Created via CasC + casc-bundle-reload-bundle CLI, no controller restart.'
+                }
+              }
+            }
+          }
+    description: 'Test job: proves a CasC bundle CLI hot-reload can add a new pipeline without restarting the controller.'
+    displayName: hello-cli-reload
+  - kind: pipeline
     name: mcp-demo-pipeline
     concurrentBuild: true
     definition:
