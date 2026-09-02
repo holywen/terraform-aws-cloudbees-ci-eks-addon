@@ -84,9 +84,6 @@ roles:
   - hudson.model.Hudson.Read
   - hudson.model.View.Read
   name: browse
-- filterable: true
-  permissions: []
-  name: cli-reload-test
 groups:
 - members:
     external_groups:
@@ -104,10 +101,3 @@ groups:
     grantedAt: current
     propagates: false
   name: Browsers
-- members:
-    external_groups:
-    - nobody-placeholder-group
-  roles:
-  - name: cli-reload-test
-    grantedAt: current
-  name: cli-reload-test-group
