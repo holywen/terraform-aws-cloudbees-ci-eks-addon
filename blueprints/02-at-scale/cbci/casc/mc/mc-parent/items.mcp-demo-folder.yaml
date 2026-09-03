@@ -30,6 +30,27 @@ items:
     description: 'Test job: proves a CasC bundle hot-reload can add a new pipeline without restarting the controller, once bundleUpdateTiming.automaticReload is enabled.'
     displayName: hello-cli-reload
   - kind: pipeline
+    name: hello-world
+    concurrentBuild: true
+    definition:
+      cpsFlowDefinition:
+        sandbox: true
+        script: |-
+          pipeline {
+            agent none
+            stages {
+              stage('Hello') {
+                steps {
+                  echo 'Hello, World!'
+                }
+              }
+            }
+          }
+    description: 'Simple hello-world demo pipeline for the CBCI MCP Server evaluation
+      demo -- a minimal, fast, always-succeeding job for exercising triggerBuild/getBuildLog
+      via the MCP router.'
+    displayName: hello-world
+  - kind: pipeline
     name: mcp-demo-pipeline
     concurrentBuild: true
     definition:
