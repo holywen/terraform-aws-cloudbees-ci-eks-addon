@@ -112,11 +112,24 @@ roles:
 # domain alongside the EKS one, this time to prove out FOLDER-scoped RBAC
 # for an Entra-ID-authenticated service account (Test 2 originally only
 # proved root-scoped access -- see tickets/Test2_Results_Ticket_277728_OIDC_EntraID.md).
-# The folder-scoped identity itself (entra-oidc-sa) lives in
-# mc/mc-parent/items.squad_y-folder.yaml, not here, same pattern as eks-oidc-sa.
+# A SEPARATE folder-scoped identity of the same name (Squad_Y/entra-oidc-sa)
+# also lives in mc/mc-parent/items.squad_y-folder.yaml, same pattern as
+# eks-oidc-sa. That's a distinct RBAC object from the root-scoped one below
+# -- root and folder scope don't share state, so restoring the original
+# Test 2 root-scoped identity here (2026-09-03, after Demo_Runbook_ServiceAccount_OIDC.md's
+# Act 2.3 was found still targeting root/cjoc for this identity) does not
+# affect the Squad_Y-scoped one at all.
 serviceAccountOidcIssuerDomains:
   - amazonaws.com
   - login.microsoftonline.com
+serviceAccounts:
+- name: entra-oidc-sa
+  authentication:
+  - type: oidc
+    id: entra-id-oidc
+    issuer: "https://login.microsoftonline.com/97f9ccac-e200-42e0-b725-6e50e4d235b8/v2.0"
+    subject: "80829c76-7168-4889-af8b-80570637964d"
+    audience: "bbd6d52f-32dc-467c-956b-807734dad4ba"
 groups:
 - members:
     external_groups:
@@ -134,3 +147,15 @@ groups:
     grantedAt: current
     propagates: false
   name: Developers
+- members:
+    serviceAccounts:
+    - entra-oidc-sa
+  roles:
+  # Least-privilege by default for this root-scoped demo identity: read-only
+  # (browse), just enough for Act 2.3's whoAmI proof-of-auth. Bump to
+  # develop/administer (or restore the original sa-token-manager role from
+  # Test 1/Test 2, since removed from this file) if a specific root-level
+  # capability needs demoing.
+  - name: browse
+    grantedAt: current
+  name: entra-sa-root-group
