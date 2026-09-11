@@ -40,6 +40,18 @@ module "eks_blueprints_addon_cbci" {
   cert_arn      = module.acm.acm_certificate_arn
   trial_license = var.trial_license
 
+  # Without an explicit helm_config.version, this module silently installs its
+  # own hardcoded internal default chart version, which lags far behind the
+  # latest chart actually published in CloudBees's own Helm repo (see the same
+  # fix, with full rationale, in ../02-at-scale/main.k8s.tf). Pinned here too
+  # for consistency, even though this blueprint is not actively deployed right
+  # now. Confirmed latest via `helm search repo cloudbees/cloudbees-core
+  # --versions` on 2026-09-11 -- CloudBees cuts new chart releases roughly
+  # weekly, so re-check with that same command before reusing this pin.
+  helm_config = {
+    version = "3.37908.0+f9b84e48b10e"
+  }
+
 }
 
 # EKS Blueprints Add-ons
