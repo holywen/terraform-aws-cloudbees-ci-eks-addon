@@ -1,7 +1,7 @@
 apiVersion: "2"
 id: "mc-parent"
 description: "Parent CasC bundle. It is tested for the CloudBees CI blueprint add-on: At scale."
-version: "18"
+version: "19"
 jcasc:
   - jcasc.main.yaml
   - jcasc.support.yaml
@@ -14,7 +14,15 @@ items:
   - items.mcp-demo-folder.yaml
 plugins:
   - plugins.yaml
-rbac:
-  - rbac.yaml
+# EXPERIMENT 2026-09-11: rbac.yaml intentionally omitted here to test whether
+# removing the managed controller's own root-level rbac: declaration lets the
+# OC's SecurityEnforcer (confirmed live as SecurityEnforcerImpl -- full
+# realmAndAuthorization enforcement, the documented default) actually take
+# over root RBAC, instead of this controller's own local rbac.yaml silently
+# winning via GlobalRbac#create on every boot (as observed prior to this
+# change). Folder-scoped serviceAccounts/groups (Squad_X/Squad_Y, declared in
+# items.*.yaml, not here) are a separate CasC component (ItemsProcessor) and
+# should be unaffected either way. Revert by restoring `rbac:\n  - rbac.yaml`
+# if this doesn't pan out.
 variables:
   - variables.yaml
