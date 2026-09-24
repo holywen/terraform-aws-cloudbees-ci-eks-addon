@@ -12,12 +12,17 @@ items:
   # CloudBees's own documented example (it defaults to the service account
   # URL). The issuer allow-list (serviceAccountOidcIssuerDomains) lives only
   # in oc/rbac.yaml -- see that file for why.
+  # Issuer path updated 2026-09-24 -- this is a fresh cluster (cbci-bp02-ksight)
+  # from a full teardown+redeploy earlier this session; the OIDC issuer's
+  # cluster-unique ID path changes on every new cluster. Re-check with
+  # `kubectl get --raw /.well-known/openid-configuration | jq .issuer` before
+  # reusing this file against a different cluster.
   serviceAccounts:
   - name: eks-oidc-sa
     authentication:
     - type: oidc
       id: eks-oidc-cbci-bp02-ksight
-      issuer: "https://oidc.eks.us-west-2.amazonaws.com/id/025702CE033D35FA8F67E6D3984F0ACF"
+      issuer: "https://oidc.eks.us-west-2.amazonaws.com/id/7FB741C08C697CC22D9631DFCC3B71C8"
       subject: "system:serviceaccount:cbci-sa-test:eks-oidc-sa"
   groups:
   - members:
@@ -31,7 +36,14 @@ items:
       serviceAccounts:
       - Squad_X/eks-oidc-sa
     roles:
-    - name: develop
+    # CHANGED 2026-09-24 (was: develop) -- testing whether centralized-role-
+    # resolution (confirmed for external_groups: in
+    # Test5_Results_SecurityEnforcement_OptOut.md, Follow-up #4) also applies
+    # to a serviceAccounts: grant. oc-enforcement-marker-role exists ONLY in
+    # oc/rbac.yaml (permissions: [hudson.model.Hudson.Read]) and is
+    # deliberately NOT defined anywhere in mc-parent/rbac.yaml. Revert to
+    # `develop` after this test.
+    - name: oc-enforcement-marker-role
       grantedAt: current
     name: eks-oidc-squad-x-bot
 
