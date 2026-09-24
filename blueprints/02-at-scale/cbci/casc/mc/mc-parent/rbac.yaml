@@ -1,5 +1,21 @@
 removeStrategy:
   rbac: SYNC
+# EXPERIMENT 2026-09-24, user-requested: testing doc 2's stated premise ("controllers
+# that inherit their authorization strategy from the operations center cannot define
+# root-scoped service accounts") directly. Both team-a and team-b are currently at
+# "Use global security enforcement" (realmAndAuthorization, fully OC-inherited -- the
+# earlier opt-out on team-a was lost somewhere across this session's many cjoc/item
+# restarts, itself worth a follow-up note). This adds a ROOT-scoped serviceAccount
+# (not inside a folder item, unlike Test 4's Squad_X/eks-oidc-sa) to see whether CasC
+# rejects it outright while both controllers inherit OC authorization. Revert-ready:
+# delete this serviceAccounts:/groups: block after the test.
+serviceAccounts:
+- name: root-scope-test-sa
+  authentication:
+  - type: oidc
+    id: root-scope-test-cbci-bp02-ksight
+    issuer: "https://oidc.eks.us-west-2.amazonaws.com/id/7FB741C08C697CC22D9631DFCC3B71C8"
+    subject: "system:serviceaccount:cbci-sa-test:root-scope-test-sa"
 roles:
 - name: authenticated
 - permissions:
@@ -101,3 +117,11 @@ groups:
     grantedAt: current
     propagates: false
   name: Browsers
+- members:
+    serviceAccounts:
+    - root-scope-test-sa
+  roles:
+  - name: browse
+    grantedAt: current
+  name: root-scope-test-group
+
