@@ -46,10 +46,10 @@ module "eks_blueprints_addon_cbci" {
   # fix, with full rationale, in ../02-at-scale/main.k8s.tf). Pinned here too
   # for consistency, even though this blueprint is not actively deployed right
   # now. Confirmed latest via `helm search repo cloudbees/cloudbees-core
-  # --versions` on 2026-09-11 -- CloudBees cuts new chart releases roughly
+  # --versions` on 2026-09-24 -- CloudBees cuts new chart releases roughly
   # weekly, so re-check with that same command before reusing this pin.
   helm_config = {
-    version = "3.37908.0+f9b84e48b10e"
+    version = "3.37914.0+c9bda104ea71"
   }
 
 }

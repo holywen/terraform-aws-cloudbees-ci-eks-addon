@@ -78,11 +78,11 @@ module "eks_blueprints_addon_cbci" {
     # explicitly to the actual latest chart (confirmed via
     # `helm search repo cloudbees/cloudbees-core --versions`) so this
     # environment matches "latest CloudBees CI version" as intended.
-    # Bumped 2026-09-11 (was 3.37665.0+4bc8a7ed09b1, app 2.568.2.37664) --
+    # Bumped 2026-09-24 (was 3.37908.0+f9b84e48b10e, app 2.568.3.37907) --
     # CloudBees cuts new chart releases roughly weekly, so re-check this pin
     # with the same `helm search repo` command rather than assuming it's
     # still current.
-    version = "3.37908.0+f9b84e48b10e"
+    version = "3.37914.0+c9bda104ea71"
     values = [templatefile("k8s/cbci-values.yml", {
       cbciAppsNodeRole        = local.mng["cbci_apps"]["labels"].role
       cbciAppsTolerationKey   = local.mng["cbci_apps"]["taints"].key
