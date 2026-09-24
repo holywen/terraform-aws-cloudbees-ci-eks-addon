@@ -1,3 +1,26 @@
+# Testing "Allow client controllers to opt-out" (docs:
+# https://docs.cloudbees.com/docs/cloudbees-ci/latest/secure/using-sso#configure-options-for-controllers).
+# securitySettingsEnforcement.global picks ONE of realmAndAuthorization / realmOnly /
+# noSecurityEnforcer -- confirmed live against this OC's own
+# /configuration-as-code/schema (2026-09-24, chart 3.37914.0+c9bda104ea71). Chosen here:
+# realmOnly (= UI's "Single Sign-On (security realm only)") with canOverride: true (=
+# the "Allow client controllers to opt-out" checkbox). Both realmAndAuthorization and
+# realmOnly expose the same canOverride boolean per the schema -- realmOnly is what lets
+# a controller keep the OC's SSO realm while still allowing that controller's own
+# independent RBAC (rbac.yaml in its CasC bundle) to govern authorization, which is
+# exactly R2/R3/R4's requirement (see ../mc/mc-parent/rbac.yaml and
+# ../../../tickets/Secondary_Findings_Product_Bugs.md #9 and #12).
+#
+# The per-controller side ("Enforce Authentication only" vs "Opt Out of all security
+# enforcement") is NOT exposed in this schema -- it appears to be a controller-item-level
+# setting configured via the OC UI (Manage Jenkins > Operations Center > <controller> >
+# Configure), not a top-level JCasC key. Plan: apply this global change, restart cjoc,
+# then set team-a's opt-out mode via the UI and CasC-export it to discover the exact key.
+security:
+  securitySettingsEnforcement:
+    global:
+      realmOnly:
+        canOverride: true
 jenkins:
   securityRealm:
     ldap:
