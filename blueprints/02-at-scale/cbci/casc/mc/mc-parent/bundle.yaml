@@ -1,7 +1,18 @@
 apiVersion: "2"
 id: "mc-parent"
 description: "Parent CasC bundle. It is tested for the CloudBees CI blueprint add-on: At scale."
-version: "20"
+version: "21"
+# EXPERIMENT 2026-09-24 (user-requested follow-up to Test5/finding #13): dropping the
+# rbac: reference entirely, to test whether a controller with NO local rbac.yaml at all,
+# and NOT opted out of security enforcement, inherits the OC's rbac.yaml roles instead.
+# team-a stays opted-out ("Enforce Authentication only"); team-b stays at "Use global
+# security enforcement" (full realmAndAuthorization) -- so this now tests BOTH questions
+# at once: (a) does an opted-out controller with no local RBAC fall back to something
+# sane, and (b) does a non-opted-out controller with no local RBAC pick up the OC's
+# rbac.yaml (checked via the oc-enforcement-marker-role marker from Test5's Follow-up #2).
+# This exact experiment was tried once before (commit 1e6495f, 2026-09-11) and reverted
+# (2749bca) without a documented conclusion -- this run writes the result down.
+# Revert-ready: restore the `rbac:\n  - rbac.yaml` block below.
 jcasc:
   - jcasc.main.yaml
   - jcasc.support.yaml
@@ -14,7 +25,5 @@ items:
   - items.mcp-demo-folder.yaml
 plugins:
   - plugins.yaml
-rbac:
-  - rbac.yaml
 variables:
   - variables.yaml
