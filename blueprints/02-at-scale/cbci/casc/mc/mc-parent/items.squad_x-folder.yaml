@@ -36,14 +36,11 @@ items:
       serviceAccounts:
       - Squad_X/eks-oidc-sa
     roles:
-    # CHANGED 2026-09-24 (was: develop) -- testing whether centralized-role-
-    # resolution (confirmed for external_groups: in
-    # Test5_Results_SecurityEnforcement_OptOut.md, Follow-up #4) also applies
-    # to a serviceAccounts: grant. oc-enforcement-marker-role exists ONLY in
-    # oc/rbac.yaml (permissions: [hudson.model.Hudson.Read]) and is
-    # deliberately NOT defined anywhere in mc-parent/rbac.yaml. Revert to
-    # `develop` after this test.
-    - name: oc-enforcement-marker-role
+    # Reverted 2026-09-24 back to `develop` (Test 4's original grant) after
+    # confirming centralized-role-resolution extends to serviceAccounts:
+    # grants too, not just external_groups: -- see
+    # Test5_Results_SecurityEnforcement_OptOut.md, Follow-up #5.
+    - name: develop
       grantedAt: current
     name: eks-oidc-squad-x-bot
 
