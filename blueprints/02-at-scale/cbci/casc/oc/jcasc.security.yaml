@@ -2,24 +2,30 @@
 # https://docs.cloudbees.com/docs/cloudbees-ci/latest/secure/using-sso#configure-options-for-controllers).
 # securitySettingsEnforcement.global picks ONE of realmAndAuthorization / realmOnly /
 # noSecurityEnforcer -- confirmed live against this OC's own
-# /configuration-as-code/schema (2026-09-24, chart 3.37914.0+c9bda104ea71). Chosen here:
-# realmOnly (= UI's "Single Sign-On (security realm only)") with canOverride: true (=
-# the "Allow client controllers to opt-out" checkbox). Both realmAndAuthorization and
-# realmOnly expose the same canOverride boolean per the schema -- realmOnly is what lets
-# a controller keep the OC's SSO realm while still allowing that controller's own
-# independent RBAC (rbac.yaml in its CasC bundle) to govern authorization, which is
-# exactly R2/R3/R4's requirement (see ../mc/mc-parent/rbac.yaml and
-# ../../../tickets/Secondary_Findings_Product_Bugs.md #9 and #12).
+# /configuration-as-code/schema (2026-09-24, chart 3.37914.0+c9bda104ea71).
+#
+# CORRECTED 2026-09-24 (was realmOnly): realmOnly never enforces authorization on ANY
+# controller, opted-out or not -- so it can't produce a clean A/B between an opted-out
+# controller and a default one; both look identical (both independently authorized).
+# Switched to realmAndAuthorization (= UI's "Single Sign-On (security realm and
+# authorization strategy)", the default/tightest mode) with canOverride: true (= the
+# "Allow client controllers to opt-out" checkbox). Now: team-b (left at "Use global
+# security enforcement") gets BOTH its securityRealm and authorizationStrategy pushed
+# and overridden by the OC; team-a (opted out to "Enforce Authentication only", set via
+# the OC UI -- see Test5_Results_SecurityEnforcement_OptOut.md) keeps the OC's SSO
+# *realm* but its own independent authorizationStrategy/rbac.yaml. That's the real A/B
+# this feature is supposed to provide for R2/R3/R4 (see ../mc/mc-parent/rbac.yaml and
+# ../../../tickets/Secondary_Findings_Product_Bugs.md #9, #12, #13).
 #
 # The per-controller side ("Enforce Authentication only" vs "Opt Out of all security
-# enforcement") is NOT exposed in this schema -- it appears to be a controller-item-level
-# setting configured via the OC UI (Manage Jenkins > Operations Center > <controller> >
-# Configure), not a top-level JCasC key. Plan: apply this global change, restart cjoc,
-# then set team-a's opt-out mode via the UI and CasC-export it to discover the exact key.
+# enforcement") is NOT exposed in this schema -- it's a controller-item-level property
+# (com.cloudbees.opscenter.server.security.SecurityEnforcer$OptOutProperty /
+# securityEnforcerOptOutMode), UI-only, confirmed via Secondary_Findings_Product_Bugs.md
+# #13.
 security:
   securitySettingsEnforcement:
     global:
-      realmOnly:
+      realmAndAuthorization:
         canOverride: true
 jenkins:
   securityRealm:
