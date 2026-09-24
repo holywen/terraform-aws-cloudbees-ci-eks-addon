@@ -97,6 +97,18 @@ roles:
   - hudson.model.Hudson.Read
   - hudson.model.View.Read
   name: browse
+# Distinctive marker role, deliberately named so it exists ONLY here (OC's own
+# rbac.yaml) and NOT in mc/mc-parent/rbac.yaml -- added 2026-09-24 to fix a real
+# flaw in the SecurityEnforcer opt-out A/B test (Test5_Results_SecurityEnforcement_OptOut.md):
+# OC's roles.administer/develop/browse share names with mc-parent's own roles, so
+# comparing team-a vs team-b's assignable-roles list could never distinguish
+# "OC pushed its own rbac.yaml" from "the controller used its own independent
+# bundle" -- both would show the same 3 names either way. This role's presence
+# (or absence) on team-a (opted out) vs team-b (fully enforced) is the actual signal.
+- filterable: true
+  permissions:
+  - hudson.model.Hudson.Read
+  name: oc-enforcement-marker-role
 # K8s ServiceAccount (EKS OIDC) evaluation. serviceAccountOidcIssuerDomains
 # is ONLY valid in the Operations Center's own rbac.yaml (confirmed via
 # CloudBees docs after this exact property, mistakenly added to
