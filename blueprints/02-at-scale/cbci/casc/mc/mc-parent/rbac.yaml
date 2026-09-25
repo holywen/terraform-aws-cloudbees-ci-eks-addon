@@ -1,5 +1,18 @@
 removeStrategy:
   rbac: SYNC
+# EXPERIMENT 2026-09-25, user-requested: re-testing whether serviceAccountOidcIssuerDomains
+# is accepted in a MANAGED CONTROLLER's own rbac.yaml (mc-parent, shared by team-a/team-b),
+# not just the OC's. Finding #6/#8 (Secondary_Findings_Product_Bugs.md) already documented
+# once that adding this key here causes a schema validation error that cascades to block
+# the ENTIRE dependent bundle graph (mc-parent -> mc-none-ha -> every managed controller
+# using it), not just this file. Confirmed via this session's own schema introspection
+# (team-b's /configuration-as-code/schema has no serviceAccountOidcIssuerDomains key at
+# all, unlike the OC's schema) that this is expected to fail the same way again on CBCI
+# 2.568.3.37913. Re-running it anyway to verify directly rather than relying on the old
+# finding. Revert-ready: delete this key immediately if bundle validation fails.
+serviceAccountOidcIssuerDomains:
+  - amazonaws.com
+  - login.microsoftonline.com
 # EXPERIMENT 2026-09-24, user-requested: testing doc 2's stated premise ("controllers
 # that inherit their authorization strategy from the operations center cannot define
 # root-scoped service accounts") directly. Both team-a and team-b are currently at
