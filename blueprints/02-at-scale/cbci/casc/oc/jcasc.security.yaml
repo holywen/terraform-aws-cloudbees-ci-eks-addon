@@ -4,23 +4,22 @@
 # noSecurityEnforcer -- confirmed live against this OC's own
 # /configuration-as-code/schema (2026-09-24, chart 3.37914.0+c9bda104ea71).
 #
-# SWITCHED BACK to realmOnly 2026-09-24, same day, user-requested ("sso only"): the
-# realmAndAuthorization test just showed root-scoped service accounts work fine on a
-# managed controller even while it fully inherits OC authorization -- doc 2's stated
-# premise ("controllers that inherit their authorization strategy from the operations
-# center cannot define root-scoped service accounts") did NOT hold in this
-# independent-CasC-bundle-per-controller architecture (see
-# Test5_Results_SecurityEnforcement_OptOut.md, Follow-up #6). Testing realmOnly now
-# anyway, per the user's explicit request, as the architecture actually intended for
-# Keysight (R4): every controller authenticates via the OC's SSO realm, but defines its
-# OWN complete rbac.yaml (roles + groups + serviceAccounts) with NO per-controller
-# opt-out needed at all -- realmOnly never enforces authorization on anyone, by
-# definition, so this should scale to 300+ controllers without a manual UI opt-out step
-# per controller (unlike realmAndAuthorization + canOverride, finding #13's CasC gap).
+# SWITCHED BACK to realmAndAuthorization 2026-09-25, TEMPORARILY, single-variable
+# before/after test: with root-scope-test-group's grant unchanged (references
+# oc-enforcement-marker-role, which exists ONLY in oc/rbac.yaml -- no same-name
+# confound), realmOnly just returned 403 on every endpoint for root-scope-test-sa
+# (whoAmI confirmed authenticated:true but authorities == only
+# [authenticated, cloudbees-ci-service-account] -- the marker role's grant never
+# resolved). Flipping to realmAndAuthorization with nothing else changed to see
+# whether the SAME grant now resolves to real Hudson.Read permissions. This directly
+# tests the user's original claim ("sso only: the controller has to define its own
+# roles") against my prior generalization (Follow-up #6, which used the same-named
+# `browse` role and never actually proved centralized resolution under realmOnly).
+# See Test5_Results_SecurityEnforcement_OptOut.md, Follow-up #7.
 security:
   securitySettingsEnforcement:
     global:
-      realmOnly:
+      realmAndAuthorization:
         canOverride: true
 jenkins:
   securityRealm:
