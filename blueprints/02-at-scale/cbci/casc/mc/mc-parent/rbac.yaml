@@ -1,15 +1,20 @@
 removeStrategy:
   rbac: SYNC
-# EXPERIMENT 2026-09-25, user-requested: re-testing whether serviceAccountOidcIssuerDomains
-# is accepted in a MANAGED CONTROLLER's own rbac.yaml (mc-parent, shared by team-a/team-b),
-# not just the OC's. Finding #6/#8 (Secondary_Findings_Product_Bugs.md) already documented
-# once that adding this key here causes a schema validation error that cascades to block
-# the ENTIRE dependent bundle graph (mc-parent -> mc-none-ha -> every managed controller
-# using it), not just this file. Confirmed via this session's own schema introspection
-# (team-b's /configuration-as-code/schema has no serviceAccountOidcIssuerDomains key at
-# all, unlike the OC's schema) that this is expected to fail the same way again on CBCI
-# 2.568.3.37913. Re-running it anyway to verify directly rather than relying on the old
-# finding. Revert-ready: delete this key immediately if bundle validation fails.
+# FIX confirmed 2026-09-25 (no longer an experiment -- keeping this as the permanent
+# baseline): serviceAccountOidcIssuerDomains, declared directly in a MANAGED
+# CONTROLLER's own rbac.yaml (mc-parent, shared by team-a/team-b), is now accepted with
+# no schema-validation error on CBCI 2.568.3.37913 -- this used to be documented as
+# OC-only, causing a cascading bundle-validation failure (Secondary_Findings_Product_Bugs.md
+# finding #8) when placed here. Retested directly rather than assuming the old finding
+# still held (schema introspection alone wasn't conclusive -- the property is absent
+# from a managed controller's own /configuration-as-code/schema, yet is accepted and
+# applied anyway). Confirmed functionally: the local OIDC issuer allow-list is
+# populated from this CasC value, survives a full pod restart with no manual Script
+# Console step (previously required -- finding #9/Gap B, finding #12), and a real
+# live-issued OIDC JWT authenticates successfully immediately after a restart with no
+# intervention. See findings #8/#9/#12's 2026-09-25 updates for the full retest.
+# Re-verify this on whichever exact CBCI version Keysight ultimately deploys -- this is
+# exactly the kind of narrow behavior that can regress between chart versions.
 serviceAccountOidcIssuerDomains:
   - amazonaws.com
   - login.microsoftonline.com
