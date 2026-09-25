@@ -54,16 +54,6 @@ items:
     properties:
       - configurationAsCode:
           bundle: "${cascBranch}/mc-none-ha"
-      # TEST 2026-09-25, user's colleague's claim: per-controller opt-out IS
-      # CasC-declarable via items.yaml's managedController properties (not the
-      # main /configuration-as-code/schema surface finding #13 originally
-      # searched -- items.yaml properties are a separate CasC-items plugin
-      # extension point). Syntax per CloudBees's own example GitOps repos
-      # (cloudbees-ci-casc-gitops/blue-team, red-team controller.yaml) and
-      # workshop labs (cloudbees-ci-casc.labs.cb-sa.io/labs/casc-rbac/).
-      - optOutProperty:
-          securityEnforcerOptOutMode:
-            authorizationOptOutMode: {}
   # Casc, Non-HA
   - kind: managedController
     name: team-b
