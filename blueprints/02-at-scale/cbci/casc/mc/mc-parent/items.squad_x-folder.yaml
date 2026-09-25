@@ -36,11 +36,13 @@ items:
       serviceAccounts:
       - Squad_X/eks-oidc-sa
     roles:
-    # Reverted 2026-09-24 back to `develop` (Test 4's original grant) after
-    # confirming centralized-role-resolution extends to serviceAccounts:
-    # grants too, not just external_groups: -- see
-    # Test5_Results_SecurityEnforcement_OptOut.md, Follow-up #5.
-    - name: develop
+    # RE-CHANGED 2026-09-25 (was: develop, reverted from Follow-up #5): re-running
+    # Follow-up #5's exact clean marker-role test to see if it STILL works today --
+    # root-scope-test-sa (mc-parent/rbac.yaml) just failed this same test (403 across
+    # the board) under BOTH realmOnly and realmAndAuthorization. The only structural
+    # difference is root-scoped grant vs this folder-scoped grant. See
+    # Test5_Results_SecurityEnforcement_OptOut.md, Follow-up #7.
+    - name: oc-enforcement-marker-role
       grantedAt: current
     name: eks-oidc-squad-x-bot
 
