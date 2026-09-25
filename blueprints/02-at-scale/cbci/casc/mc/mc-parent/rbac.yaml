@@ -139,7 +139,15 @@ groups:
     serviceAccounts:
     - root-scope-test-sa
   roles:
-  - name: browse
+  # CHANGED 2026-09-25 (was: browse) -- user caught a real gap: Follow-up #6
+  # (Test5_Results_SecurityEnforcement_OptOut.md) claimed root-scoped SAs work "under
+  # both enforcement modes" but used `browse`, which is ALSO defined locally in this
+  # same file -- the exact same-name confound Follow-up #1-3 already got called out
+  # for once. It never actually tested central-role-resolution under realmOnly
+  # specifically (only Follow-up #5, external groups, tested that under
+  # realmAndAuthorization). Global mode is currently realmOnly -- this is the clean
+  # test. oc-enforcement-marker-role exists ONLY in oc/rbac.yaml.
+  - name: oc-enforcement-marker-role
     grantedAt: current
   name: root-scope-test-group
 
