@@ -19,7 +19,7 @@
 security:
   securitySettingsEnforcement:
     global:
-      realmAndAuthorization:
+      realmOnly:
         canOverride: true
 jenkins:
   securityRealm:
