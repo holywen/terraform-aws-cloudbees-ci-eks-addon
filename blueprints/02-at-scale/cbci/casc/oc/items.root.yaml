@@ -52,8 +52,13 @@ items:
     # tickets/Secondary_Findings_Product_Bugs.md finding #6 for the fuller,
     # still partly unresolved story around managed-controller CasC delivery.
     properties:
+      # RETRY 2026-09-28 (was: mc-none-ha) -- this time, wait for the OC's
+      # own consolidated-bundle build for mc-team-a-test to complete (check
+      # cb-casc-bundles-store-log/*/validations.yaml) BEFORE triggering any
+      # deprovision/reprovision, closing off a checkout-timing race as the
+      # explanation before concluding anything else.
       - configurationAsCode:
-          bundle: "${cascBranch}/mc-none-ha"
+          bundle: "${cascBranch}/mc-team-a-test"
   # Casc, Non-HA
   - kind: managedController
     name: team-b
