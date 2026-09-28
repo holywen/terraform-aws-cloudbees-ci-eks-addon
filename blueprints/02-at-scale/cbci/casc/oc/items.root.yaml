@@ -52,13 +52,8 @@ items:
     # tickets/Secondary_Findings_Product_Bugs.md finding #6 for the fuller,
     # still partly unresolved story around managed-controller CasC delivery.
     properties:
-      # TEMPORARILY reassigned 2026-09-28 (was: mc-none-ha, shared with team-b)
-      # to test whether a Group.CreateToken grant on team-a's OWN bundle
-      # reaches team-b's separate JVM -- mc-team-a-test is parented on
-      # mc-parent but has its OWN rbac.yaml, not shared with team-b at all.
-      # Revert to mc-none-ha after the test.
       - configurationAsCode:
-          bundle: "${cascBranch}/mc-team-a-test"
+          bundle: "${cascBranch}/mc-none-ha"
   # Casc, Non-HA
   - kind: managedController
     name: team-b
