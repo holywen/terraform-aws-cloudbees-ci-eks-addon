@@ -52,11 +52,8 @@ items:
     # tickets/Secondary_Findings_Product_Bugs.md finding #6 for the fuller,
     # still partly unresolved story around managed-controller CasC delivery.
     properties:
-      # TEST 2026-09-28, user-requested: standalone bundle, NOT inherited
-      # from mc-parent (no parent: key) -- ruling out whether parent-bundle
-      # inheritance itself is finding #17's trigger.
       - configurationAsCode:
-          bundle: "${cascBranch}/mc-team-a-bundle"
+          bundle: "${cascBranch}/mc-none-ha"
   # Casc, Non-HA
   - kind: managedController
     name: team-b
@@ -99,10 +96,8 @@ items:
             labels:
               "cloudbees.prometheus": "true"
     properties:
-      # TEST 2026-09-28, user-requested: standalone bundle, NOT inherited
-      # from mc-parent (no parent: key).
       - configurationAsCode:
-          bundle: "${cascBranch}/mc-team-b-bundle"
+          bundle: "${cascBranch}/mc-none-ha"
   # Casc, HA
   # team-c-ha REMOVED (isolated) from this bundle: a genuine CloudBees product
   # bug in the master-provisioning-kubernetes plugin's HPA reconciliation
