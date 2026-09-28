@@ -54,6 +54,22 @@ items:
     properties:
       - configurationAsCode:
           bundle: "${cascBranch}/mc-none-ha"
+    # Test 1 re-test fixtures (2026-09-28) -- item-scoped target SA + a group
+    # granting sa-token-manager ONLY at this item's scope (Scenario A). Per
+    # the original 2026-08-17 result, this should have no effect at all, even
+    # for ca-target-sa in this same item. See oc/rbac.yaml's sa-token-manager
+    # comment for context.
+    serviceAccounts:
+    - name: ca-target-sa
+      authentication: []
+    groups:
+    - name: team-a-token-managers
+      roles:
+      - name: sa-token-manager
+        grantedAt: current
+      members:
+        serviceAccounts:
+        - sa-scope-test-item
   # Casc, Non-HA
   - kind: managedController
     name: team-b
@@ -98,6 +114,13 @@ items:
     properties:
       - configurationAsCode:
           bundle: "${cascBranch}/mc-none-ha"
+    # Test 1 re-test target (2026-09-28) -- item-scoped SA on a SIBLING
+    # controller, used to check whether Scenario B's root-granted
+    # sa-token-manager can reach tokens on a controller it was never
+    # explicitly scoped to.
+    serviceAccounts:
+    - name: cb-target-sa
+      authentication: []
   # Casc, HA
   # team-c-ha REMOVED (isolated) from this bundle: a genuine CloudBees product
   # bug in the master-provisioning-kubernetes plugin's HPA reconciliation
