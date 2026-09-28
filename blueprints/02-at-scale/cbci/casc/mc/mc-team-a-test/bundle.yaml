@@ -1,0 +1,13 @@
+apiVersion: "2"
+id: "mc-team-a-test"
+description: "TEST 2026-09-28: team-a-only bundle, layered on top of mc-parent, to properly isolate the cross-controller Group.CreateToken reach test from team-b. Not shared with team-b (unlike mc-none-ha)."
+version: "3"
+parent: "mc-parent"
+allowCapExceptions: true
+jcascMergeStrategy: "errorOnConflict"
+jcasc:
+  - jcasc.main.yaml
+rbac:
+  - rbac.yaml
+variables:
+  - variables.yaml
