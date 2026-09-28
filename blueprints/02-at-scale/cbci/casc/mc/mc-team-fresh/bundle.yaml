@@ -1,0 +1,13 @@
+apiVersion: "2"
+id: "mc-team-fresh"
+description: "TEST 2026-09-28: dedicated bundle for a BRAND NEW managed controller (never before provisioned), to test whether provisioning a controller fresh with its own bundle from creation works, as distinct from finding #17 (reassigning an ALREADY-PROVISIONED controller's bundle, which fails)."
+version: "1"
+parent: "mc-parent"
+allowCapExceptions: true
+jcascMergeStrategy: "errorOnConflict"
+jcasc:
+  - jcasc.main.yaml
+rbac:
+  - rbac.yaml
+variables:
+  - variables.yaml
