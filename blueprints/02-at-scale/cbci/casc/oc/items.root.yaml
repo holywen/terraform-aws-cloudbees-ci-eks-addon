@@ -98,47 +98,6 @@ items:
     properties:
       - configurationAsCode:
           bundle: "${cascBranch}/mc-none-ha"
-  # TEST 2026-09-28: brand-new managed controller, NEVER before provisioned,
-  # pointed at its OWN dedicated bundle from creation -- distinct from
-  # finding #17 (reassigning an ALREADY-running controller's bundle, which
-  # fails). Tests whether initial provisioning with a private bundle works.
-  - kind: managedController
-    name: team-fresh
-    configuration:
-      kubernetes:
-        memory: 2048
-        cpus: 1.0
-        disk: 5
-        nodeSelectors: topology.kubernetes.io/zone=${sec_awsRegion}a,role=cb-apps
-        storageClassName: "gp3-a"
-        yaml: |-
-          ---
-          apiVersion: "apps/v1"
-          kind: "StatefulSet"
-          spec:
-            template:
-              spec:
-                tolerations:
-                - key: "dedicated"
-                  operator: "Equal"
-                  value: "cb-apps"
-                  effect: "NoSchedule"
-                volumes:
-                - name: cbci-secrets
-                  secret:
-                    secretName: ${cascSecretsName}
-                containers:
-                - name: jenkins
-                  env:
-                  - name: SECRETS
-                    value: "/var/run/secrets/cbci"
-                  volumeMounts:
-                  - name: cbci-secrets
-                    mountPath: "/var/run/secrets/cbci"
-                    readOnly: true
-    properties:
-      - configurationAsCode:
-          bundle: "${cascBranch}/mc-team-fresh"
   # Casc, HA
   # team-c-ha REMOVED (isolated) from this bundle: a genuine CloudBees product
   # bug in the master-provisioning-kubernetes plugin's HPA reconciliation
