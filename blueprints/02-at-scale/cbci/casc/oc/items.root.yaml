@@ -52,13 +52,8 @@ items:
     # tickets/Secondary_Findings_Product_Bugs.md finding #6 for the fuller,
     # still partly unresolved story around managed-controller CasC delivery.
     properties:
-      # RETRY 2026-09-28 -- root cause of the previous two failed attempts
-      # found and fixed (finding #16): team-b being hibernated (0 replicas)
-      # made its own KubernetesMasterProvisioning.getDomain() return null,
-      # NPEing team-a's UNRELATED provisioning attempt. team-b confirmed
-      # awake before this attempt.
       - configurationAsCode:
-          bundle: "${cascBranch}/mc-team-a-test"
+          bundle: "${cascBranch}/mc-none-ha"
   # Casc, Non-HA
   - kind: managedController
     name: team-b
