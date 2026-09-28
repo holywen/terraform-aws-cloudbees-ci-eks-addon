@@ -53,7 +53,7 @@ items:
     # still partly unresolved story around managed-controller CasC delivery.
     properties:
       - configurationAsCode:
-          bundle: "${cascBranch}/mc-team-a-bundle"
+          bundle: "${cascBranch}/mc-team-a-bundle2"
   # Casc, Non-HA
   - kind: managedController
     name: team-b
@@ -97,7 +97,7 @@ items:
               "cloudbees.prometheus": "true"
     properties:
       - configurationAsCode:
-          bundle: "${cascBranch}/mc-team-b-bundle"
+          bundle: "${cascBranch}/mc-team-b-bundle2"
   # Casc, HA
   # team-c-ha REMOVED (isolated) from this bundle: a genuine CloudBees product
   # bug in the master-provisioning-kubernetes plugin's HPA reconciliation
