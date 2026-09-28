@@ -52,15 +52,8 @@ items:
     # tickets/Secondary_Findings_Product_Bugs.md finding #6 for the fuller,
     # still partly unresolved story around managed-controller CasC delivery.
     properties:
-      # TEMPORARILY reassigned 2026-09-28 (was: mc-none-ha, shared with team-b)
-      # to test whether a Group.CreateToken grant on team-a's OWN bundle
-      # reaches team-b's separate JVM. Revert to mc-none-ha after the test --
-      # note: a bundle REASSIGNMENT (not just content update) requires a full
-      # OC-triggered deprovision + provisionAndStartAction cycle to take
-      # effect cleanly; a plain pod restart alone leaves the pod stuck on a
-      # stale bundle-link Secret (404 on the OC's config-bundle endpoint).
       - configurationAsCode:
-          bundle: "${cascBranch}/mc-team-a-test"
+          bundle: "${cascBranch}/mc-none-ha"
   # Casc, Non-HA
   - kind: managedController
     name: team-b
