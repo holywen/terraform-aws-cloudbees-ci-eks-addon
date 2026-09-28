@@ -54,6 +54,17 @@ items:
     properties:
       - configurationAsCode:
           bundle: "${cascBranch}/mc-none-ha"
+    # TEST 1 follow-up (2026-09-28): Scenario A3 -- ca-target-sa given real
+    # credentials but deliberately NO grant of any kind (no role, no group
+    # membership). Used directly to attempt cb-target-sa's createToken on
+    # the SIBLING item, team-b -- tests bare authentication alone, with
+    # zero permissions, against a cross-item target.
+    serviceAccounts:
+    - name: ca-target-sa
+      authentication:
+      - type: password
+        id: ca-target-sa-token-a3
+        password: cloudbees_ci_sa_b9d1c229527fdf3024410e3461a1dc0b
   # Casc, Non-HA
   - kind: managedController
     name: team-b
@@ -98,6 +109,12 @@ items:
     properties:
       - configurationAsCode:
           bundle: "${cascBranch}/mc-none-ha"
+    # TEST 1 follow-up (2026-09-28): Scenario A3 target -- lives on team-b,
+    # a SIBLING item from ca-target-sa's home item (team-a). No auth needed;
+    # only attempted AS a target, never as an actor.
+    serviceAccounts:
+    - name: cb-target-sa
+      authentication: []
   # Casc, HA
   # team-c-ha REMOVED (isolated) from this bundle: a genuine CloudBees product
   # bug in the master-provisioning-kubernetes plugin's HPA reconciliation
