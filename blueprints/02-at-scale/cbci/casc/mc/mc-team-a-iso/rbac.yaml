@@ -1,0 +1,28 @@
+removeStrategy:
+  rbac: SYNC
+roles:
+- filterable: false
+  permissions:
+  - hudson.model.Hudson.Read
+  - hudson.model.Item.Read
+  - hudson.model.Item.Discover
+  - nectar.plugins.rbac.groups.Group.Manage
+  - nectar.plugins.rbac.groups.Group.CreateToken
+  name: teamA-only-token-manager
+serviceAccounts:
+- name: teamA-only-actor-sa
+  authentication:
+  - type: password
+    id: teamA-only-actor-token
+    description: "exists ONLY on team-a, unique name, never on team-b"
+    password: cloudbees_ci_sa_a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6
+- name: teamA-only-target-sa
+  authentication: []
+groups:
+- members:
+    serviceAccounts:
+    - teamA-only-actor-sa
+  roles:
+  - name: teamA-only-token-manager
+    grantedAt: current
+  name: teamA-only-token-managers-group

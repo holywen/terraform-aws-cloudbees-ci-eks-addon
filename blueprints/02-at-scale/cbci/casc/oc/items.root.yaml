@@ -52,8 +52,13 @@ items:
     # tickets/Secondary_Findings_Product_Bugs.md finding #6 for the fuller,
     # still partly unresolved story around managed-controller CasC delivery.
     properties:
+      # RETRY 2026-09-28, fresh never-used bundle ID (mc-team-a-iso, distinct
+      # from the earlier mc-team-a-test) with uniquely-named fixtures, to
+      # rule out ID-specific poisoning as finding #17's cause, and to test
+      # genuine cross-controller reach with names that cannot collide with
+      # anything on team-b at all.
       - configurationAsCode:
-          bundle: "${cascBranch}/mc-none-ha"
+          bundle: "${cascBranch}/mc-team-a-iso"
   # Casc, Non-HA
   - kind: managedController
     name: team-b
