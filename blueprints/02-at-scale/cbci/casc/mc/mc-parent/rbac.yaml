@@ -33,7 +33,7 @@ serviceAccounts:
   - type: password
     id: mc-actor-sa-token
     description: "shared-mc-parent cross-controller reach test actor"
-    password: cloudbees_ci_sa_mc28actor19test07a4b1c2d3e4f5061728
+    password: cloudbees_ci_sa_c5f3794519360b8ce7d348b713533d85
 - name: mc-target-sa
   authentication: []
 - name: root-scope-test-sa
