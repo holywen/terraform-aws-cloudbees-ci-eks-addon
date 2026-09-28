@@ -54,21 +54,6 @@ items:
     properties:
       - configurationAsCode:
           bundle: "${cascBranch}/mc-none-ha"
-    # TEST 1 follow-up (2026-09-28): item-scoped target for Scenario A2 --
-    # lives on team-a, same item as sa-scope-test-item's ONLY grant
-    # (team-a-token-managers, below). Kept for continuity with the original
-    # Scenario A; the new scenario's target is cb-target-sa on team-b.
-    serviceAccounts:
-    - name: ca-target-sa
-      authentication: []
-    groups:
-    - name: team-a-token-managers
-      roles:
-      - name: sa-token-manager
-        grantedAt: current
-      members:
-        serviceAccounts:
-        - sa-scope-test-item
   # Casc, Non-HA
   - kind: managedController
     name: team-b
@@ -113,14 +98,6 @@ items:
     properties:
       - configurationAsCode:
           bundle: "${cascBranch}/mc-none-ha"
-    # TEST 1 follow-up (2026-09-28): Scenario A2 target -- lives on team-b, a
-    # SIBLING item from sa-scope-test-item's grant (which is scoped only to
-    # team-a, via team-a-token-managers above). No group grant on this item
-    # at all -- this SA exists here purely to be attempted as a cross-item
-    # target.
-    serviceAccounts:
-    - name: cb-target-sa
-      authentication: []
   # Casc, HA
   # team-c-ha REMOVED (isolated) from this bundle: a genuine CloudBees product
   # bug in the master-provisioning-kubernetes plugin's HPA reconciliation
