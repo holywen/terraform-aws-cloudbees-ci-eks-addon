@@ -28,6 +28,14 @@ serviceAccountOidcIssuerDomains:
 # rejects it outright while both controllers inherit OC authorization. Revert-ready:
 # delete this serviceAccounts:/groups: block after the test.
 serviceAccounts:
+- name: mc-actor-sa
+  authentication:
+  - type: password
+    id: mc-actor-sa-token
+    description: "shared-mc-parent cross-controller reach test actor"
+    password: cloudbees_ci_sa_mc28actor19test07a4b1c2d3e4f5061728
+- name: mc-target-sa
+  authentication: []
 - name: root-scope-test-sa
   authentication:
   - type: oidc
@@ -118,6 +126,22 @@ roles:
   - hudson.model.Hudson.Read
   - hudson.model.View.Read
   name: browse
+# TEST 2026-09-28, user question: set Group.CreateToken in an individual
+# controller's OWN rbac.yaml (this file, mc-parent -- shared by team-a and
+# team-b, so this role/grant will exist independently on BOTH). Does the
+# resulting SA reach a SIBLING controller too? Since this is shared, a
+# "yes" here cannot by itself distinguish genuine cross-JVM reach from
+# each controller independently evaluating the same replicated local
+# grant -- checked explicitly below via each controller's own persisted
+# nectar-rbac.xml.
+- filterable: false
+  permissions:
+  - hudson.model.Hudson.Read
+  - hudson.model.Item.Read
+  - hudson.model.Item.Discover
+  - nectar.plugins.rbac.groups.Group.Manage
+  - nectar.plugins.rbac.groups.Group.CreateToken
+  name: mc-sa-token-manager
 groups:
 - members:
     external_groups:
@@ -150,4 +174,11 @@ groups:
   - name: browse
     grantedAt: current
   name: root-scope-test-group
+- members:
+    serviceAccounts:
+    - mc-actor-sa
+  roles:
+  - name: mc-sa-token-manager
+    grantedAt: current
+  name: mc-token-managers
 
