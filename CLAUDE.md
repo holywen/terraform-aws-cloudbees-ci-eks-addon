@@ -82,6 +82,15 @@ DESTROY_WL_ONLY=true  ROOT=02-at-scale make destroy   # workloads-only: removes 
   OIDC), not LDAP — there is no local `admin`/password account anymore. Basic-auth-based
   diagnostics (e.g. hitting `/scriptText`) will 401; use `kubectl exec` filesystem
   inspection instead when live script-console access isn't available.
+- **Switching `securitySettingsEnforcement.global` ("SSO only" vs "SSO + RBAC") no longer
+  requires hand-editing content.** Two ready-built variants live in the sibling
+  `oc-jcasc-security-modes/` directory (`realmOnly.yaml` / `realmAndAuthorization.yaml`),
+  deliberately kept *outside* `oc/`'s own bundle folder. To switch: `cp
+  oc-jcasc-security-modes/<mode>.yaml oc/jcasc.security-mode.yaml`, bump `oc/bundle.yaml`'s
+  version, redeploy. Do **not** keep both variants inside `oc/` at once — CloudBees's
+  bundle validator rejects the *entire* bundle if any file in the bundle folder is present
+  but unreferenced in `bundle.yaml` (a real gotcha, confirmed live 2026-09-29), which is
+  exactly why the inactive variant must live one level up.
 
 ## Known product-side gotchas (see `Secondary_Findings_Product_Bugs.md` for full detail)
 
