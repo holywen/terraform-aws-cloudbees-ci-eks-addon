@@ -59,17 +59,22 @@ serviceAccounts:
 # -power-users-sa / -developers-sa / -browsers-sa. Client secrets exist in Azure (1-year
 # expiry) for live testing but are not stored in this repo.
 - name: admins-sa
-  # Password/token authentication REMOVED 2026-09-29, per user-requested experiment:
-  # confirms that a service account with authentication: [] cannot log in at all
-  # (matches the target-only pattern used elsewhere in this engagement, e.g.
-  # root-target-sa/ca-target-sa in Test1_Results_Ticket_277627_CreateToken_Scoping.md)
-  # -- CBCI's schema has only ONE non-OIDC authentication type, "type: password",
-  # which CloudBees's own docs describe as token-based authentication (the value is
-  # the same cloudbees_ci_sa_-prefixed format createToken generates); there is no
-  # separate "type: token" to switch to instead. This account remains creatable as
-  # a live createToken TARGET (an Admins-tier actor can still mint it a fresh token
-  # at runtime, per finding #20) -- it just has no CasC-declared, durable credential.
-  authentication: []
+  # `password:` value REMOVED 2026-09-29 per user request, `type: password` entry
+  # kept (same id, so this is "the same token, no value asserted" rather than a
+  # brand-new one). Per CloudBees's docs, `password` is "optional for existing
+  # tokens; required for new ones" -- CAUTION, confirmed live: on the FIRST
+  # redeploy after this change, the previous password kept working (200) because
+  # the managed controller's own pod restarted before the OC had finished
+  # propagating the updated bundle down to it -- a live-verified instance of the
+  # CasC-hot-reload timing race (Secondary_Findings_Product_Bugs.md finding #1).
+  # A second, later restart of the SAME pod (no further CasC change) then genuinely
+  # picked up the change. Don't trust the very first post-change restart as
+  # conclusive -- re-check after a short wait, or restart the controller a second
+  # time, before drawing a conclusion.
+  authentication:
+  - type: password
+    id: admins-sa-token
+    description: "Password-authenticated service account for the Admins role."
 - name: admins-oidc-sa
   authentication:
   - type: oidc
@@ -78,8 +83,11 @@ serviceAccounts:
     subject: "97abd13b-4a87-4857-bda7-6dc874ef078c"
     audience: "a883906a-ae3e-48df-8dda-fc605f5dc2a2"
 - name: power-users-sa
-  # See admins-sa's comment above -- authentication removed 2026-09-29.
-  authentication: []
+  # See admins-sa's comment above -- `password:` value removed 2026-09-29.
+  authentication:
+  - type: password
+    id: power-users-sa-token
+    description: "Password-authenticated service account for the Power Users role."
 - name: power-users-oidc-sa
   authentication:
   - type: oidc
@@ -88,8 +96,11 @@ serviceAccounts:
     subject: "0a9430a2-8b20-422e-9e33-20a243b59b58"
     audience: "76a998a6-b20b-4ac0-a5da-959e063a9537"
 - name: developers-sa
-  # See admins-sa's comment above -- authentication removed 2026-09-29.
-  authentication: []
+  # See admins-sa's comment above -- `password:` value removed 2026-09-29.
+  authentication:
+  - type: password
+    id: developers-sa-token
+    description: "Password-authenticated service account for the Developers role."
 - name: developers-oidc-sa
   authentication:
   - type: oidc
@@ -98,8 +109,11 @@ serviceAccounts:
     subject: "7dc13da2-e491-4c13-8487-f04d473f13d9"
     audience: "d9c9728b-f3c5-4229-8ae7-91a9f3b25dcd"
 - name: browsers-sa
-  # See admins-sa's comment above -- authentication removed 2026-09-29.
-  authentication: []
+  # See admins-sa's comment above -- `password:` value removed 2026-09-29.
+  authentication:
+  - type: password
+    id: browsers-sa-token
+    description: "Password-authenticated service account for the Browsers role."
 - name: browsers-oidc-sa
   authentication:
   - type: oidc
