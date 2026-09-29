@@ -1,0 +1,69 @@
+removeStrategy:
+  rbac: SYNC
+serviceAccountOidcIssuerDomains:
+  - amazonaws.com
+  - login.microsoftonline.com
+roles:
+- name: authenticated
+- permissions:
+  - hudson.model.Hudson.Administer
+  - hudson.model.Hudson.Read
+  - hudson.model.Item.Create
+  - hudson.model.Item.Read
+  - hudson.model.Item.Configure
+  - hudson.model.Item.Delete
+  - hudson.model.View.Read
+  name: administer
+- name: anonymous
+- filterable: true
+  permissions:
+  - hudson.model.Item.Read
+  - hudson.model.Item.Discover
+  - hudson.model.Hudson.Read
+  - hudson.model.View.Read
+  name: browse
+# TEST 1 REDESIGN (2026-09-28, user-requested): "SSO + RBAC" vs "SSO only"
+# comparison. teamB-sa is a ROOT-scoped service account defined directly in
+# THIS controller's own standalone bundle, with a LOCALLY-defined role
+# granting Group.CreateToken -- mirrors team-a's mc-team-a-bundle/rbac.yaml.
+- filterable: false
+  permissions:
+  - hudson.model.Hudson.Read
+  - hudson.model.Item.Read
+  - hudson.model.Item.Discover
+  - nectar.plugins.rbac.groups.Group.Manage
+  - nectar.plugins.rbac.groups.Group.CreateToken
+  name: teamB-sa-token-manager
+serviceAccounts:
+- name: teamB-sa
+  authentication:
+  - type: password
+    id: teamB-sa-token
+    description: "root-scoped on team-b's own standalone bundle; exists ONLY on team-b"
+    password: cloudbees_ci_sa_75680fa568e4faceb7139d3dba23d04f
+- name: teamB-target-sa
+  authentication: []
+groups:
+- members:
+    external_groups:
+    - CI_Admins
+  roles:
+  - name: administer
+    grantedAt: current
+  name: Administrators
+- members:
+    external_groups:
+    - Dev_Team_X
+    - Dev_Team_Y
+  roles:
+  - name: browse
+    grantedAt: current
+    propagates: false
+  name: Browsers
+- members:
+    serviceAccounts:
+    - teamB-sa
+  roles:
+  - name: teamB-sa-token-manager
+    grantedAt: current
+  name: teamB-token-managers
