@@ -7,6 +7,20 @@
 # `CasCException: remove strategy is required` -- each merged fragment needs its own).
 removeStrategy:
   rbac: SYNC
+# serviceAccountOidcIssuerDomains MUST be repeated in every merged rbac.yaml
+# fragment, not just the parent's -- confirmed live (2026-09-29): with this bundle's
+# own rbac.yaml added (removeStrategy: SYNC, applied AFTER mc-parent's fragment in
+# the merge order -- confirmed via this controller's own core-casc-bundle/bundle.yaml
+# `rbac:` list), the allow-list set by mc-parent's fragment got silently RESET to
+# empty by this later fragment not re-declaring it -- breaking every Entra
+# OIDC-authenticated service account fleet-wide (401, previously-working tokens
+# rejected) until this was added here too. This is NOT additive/unioned merge
+# behavior for this particular key -- unlike roles:/serviceAccounts:/groups:, which
+# do merge additively across fragments by name, this single list-valued key is
+# last-fragment-wins. See Secondary_Findings_Product_Bugs.md finding #22.
+serviceAccountOidcIssuerDomains:
+  - amazonaws.com
+  - login.microsoftonline.com
 # The "Admins" role referenced below is defined in mc-parent/rbac.yaml (Keysight AAA
 # R1); since parent-bundle inheritance merges into one effective, controller-local
 # RBAC config (confirmed via each controller's own consolidated
