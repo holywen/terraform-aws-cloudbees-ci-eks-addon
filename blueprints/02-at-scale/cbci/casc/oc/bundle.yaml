@@ -1,9 +1,14 @@
 apiVersion: "2"
 id: "oc"
-version: "31"
+version: "32"
 jcasc:
   - jcasc.main.yaml
   - jcasc.security.yaml
+  # Enforcement mode -- swap this one line to switch between "SSO only" and
+  # "SSO + RBAC" without touching any content: use
+  # jcasc.security-mode.realmOnly.yaml (current) or
+  # jcasc.security-mode.realmAndAuthorization.yaml.
+  - jcasc.security-mode.realmOnly.yaml
   - jcasc.k8s-agents.yaml
   - jcasc.support.yaml
 items:

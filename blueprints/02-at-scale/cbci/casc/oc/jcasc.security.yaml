@@ -1,33 +1,14 @@
-# Testing "Allow client controllers to opt-out" (docs:
-# https://docs.cloudbees.com/docs/cloudbees-ci/latest/secure/using-sso#configure-options-for-controllers).
-# securitySettingsEnforcement.global picks ONE of realmAndAuthorization / realmOnly /
-# noSecurityEnforcer -- confirmed live against this OC's own
-# /configuration-as-code/schema (2026-09-24, chart 3.37914.0+c9bda104ea71).
-#
-# SWITCHED BACK to realmAndAuthorization 2026-09-25, TEMPORARILY, single-variable
-# before/after test: with root-scope-test-group's grant unchanged (references
-# oc-enforcement-marker-role, which exists ONLY in oc/rbac.yaml -- no same-name
-# confound), realmOnly just returned 403 on every endpoint for root-scope-test-sa
-# (whoAmI confirmed authenticated:true but authorities == only
-# [authenticated, cloudbees-ci-service-account] -- the marker role's grant never
-# resolved). Flipping to realmAndAuthorization with nothing else changed to see
-# whether the SAME grant now resolves to real Hudson.Read permissions. This directly
-# tests the user's original claim ("sso only: the controller has to define its own
-# roles") against my prior generalization (Follow-up #6, which used the same-named
-# `browse` role and never actually proved centralized resolution under realmOnly).
-# See Test5_Results_SecurityEnforcement_OptOut.md, Follow-up #7.
-# TEST 1 REDESIGN (2026-09-28/29): flipped to realmAndAuthorization,
-# single-variable change (nothing else touched), to re-run the sa-root/
-# teamA-sa/teamB-sa matrix under "SSO + RBAC" for direct comparison against
-# the realmOnly results already captured. Results identical to realmOnly in
-# every scenario. Reverted back to realmOnly afterward, this environment's
-# established baseline (no per-controller opt-out step needed at scale). See
-# Test1_Results_Ticket_277627_CreateToken_Scoping.md.
-security:
-  securitySettingsEnforcement:
-    global:
-      realmOnly:
-        canOverride: true
+# Base jcasc.security.yaml -- NON-enforcement-mode content only (security realm,
+# authorization strategy, remoting security, vault credentials config). The
+# `securitySettingsEnforcement.global` mode itself lives in one of the two
+# switchable files below (jcasc.security-mode.realmOnly.yaml /
+# jcasc.security-mode.realmAndAuthorization.yaml) -- to change mode, edit
+# bundle.yaml's `jcasc:` list to reference the other file, bump the version,
+# and redeploy. No need to hand-edit the enforcement block itself anymore
+# (avoids the risk of a typo mid-test, and keeps both variants pre-validated
+# and permanently available side by side). See
+# Test1_Results_Ticket_277627_CreateToken_Scoping.md and
+# Test5_Results_SecurityEnforcement_OptOut.md for the history behind this split.
 jenkins:
   securityRealm:
     ldap:
