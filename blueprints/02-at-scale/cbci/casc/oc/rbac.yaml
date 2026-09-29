@@ -182,12 +182,13 @@ groups:
     grantedAt: current
   name: entra-enduser-admins
 # User-requested (2026-09-29): two normal (non-service-account) human user
-# grants, browse role, via a dedicated group.
-- members:
+# grants, browse role (non-propagating), via a dedicated group.
+- name: team-admins
+  members:
     users:
     - team-a-admin@444666.best
     - team-b-admin@444666.best
   roles:
   - name: browse
     grantedAt: current
-  name: team-admin
+    propagates: false
