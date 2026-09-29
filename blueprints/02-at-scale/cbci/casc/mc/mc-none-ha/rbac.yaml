@@ -29,23 +29,24 @@ serviceAccountOidcIssuerDomains:
 # mechanism (D1 F3), it's simple same-database local merge, so it does not depend on
 # securitySettingsEnforcement.global at all.
 #
-# Distinct name/id from mc-parent's own admins-sa/admins-oidc-sa deliberately --
-# this is a SEPARATE local admin identity, one independently-provisioned copy per
-# controller using this bundle (team-a and team-b each get their own, per the
-# shared-template pattern documented throughout this engagement), not the shared
-# R1 role-based accounts.
-serviceAccounts:
-- name: mc-none-ha-admin-sa
-  authentication:
-  - type: password
-    id: mc-none-ha-admin-sa-token
-    description: "Local admin service account for mc-none-ha bundle controllers."
-    password: cloudbees_ci_sa_a4eba4167928af91aaed0a81682becd8
+# CHANGED 2026-09-29, per user request: this local admin is now a REAL HUMAN Entra
+# ID identity via SSO, not a CBCI Service Account -- mc-parent's own jcasc.security.yaml
+# sets `securityRealm: "operationsCenter"` on every managed controller, so human
+# login here is relayed from the OC's own oic-auth (Entra ID) realm, exactly the
+# mechanism already proven end-to-end in Test3_Results_EndUser_OIDC_EntraID.md
+# (direct `members.users` grant, and separately `groupsFieldName`->`external_groups`
+# claim mapping -- both confirmed working, including via SSO relay to a managed
+# controller). `holywen@hotmail.com` is the same real, already-tested Entra identity
+# Test 3 used for that exact relay confirmation. Distinct from mc-parent's own
+# admins-sa/admins-oidc-sa (still CBCI Service Accounts) -- this is a SEPARATE local
+# admin GRANT to a human identity, one independently-evaluated per controller using
+# this bundle (team-a and team-b), not the shared R1 role-based service accounts.
 groups:
 - members:
-    serviceAccounts:
-    - mc-none-ha-admin-sa
+    users:
+    - holywen@hotmail.com
   roles:
   - name: "Admins"
     grantedAt: current
-  name: mc-none-ha-admin-service-accounts
+  name: mc-none-ha-admin-users
+
