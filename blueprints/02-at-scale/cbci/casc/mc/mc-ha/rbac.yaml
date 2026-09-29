@@ -50,4 +50,13 @@ groups:
   - name: "Admins"
     grantedAt: current
   name: mc-ha-admin-users
+# User-requested (2026-09-29): controller-local administer grant for team-a's
+# own admin, once team-a is reassigned to this bundle.
+- name: controller-team-a-admins
+  members:
+    users:
+    - team-a-admin@444666.best
+  roles:
+  - name: administer
+    grantedAt: current
 

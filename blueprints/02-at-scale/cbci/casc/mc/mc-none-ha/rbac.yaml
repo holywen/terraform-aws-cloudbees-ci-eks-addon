@@ -49,4 +49,14 @@ groups:
   - name: "Admins"
     grantedAt: current
   name: mc-none-ha-admin-users
+# User-requested (2026-09-29): controller-local administer grant for team-b's
+# own admin. mc-none-ha is now team-b-only (team-a reassigned to mc-ha for
+# genuine per-controller isolation), so this grant is exclusive to team-b.
+- name: controller-team-b-admins
+  members:
+    users:
+    - team-b-admin@444666.best
+  roles:
+  - name: administer
+    grantedAt: current
 
