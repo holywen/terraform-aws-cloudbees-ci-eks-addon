@@ -182,13 +182,23 @@ groups:
     grantedAt: current
   name: entra-enduser-admins
 # User-requested (2026-09-29): two normal (non-service-account) human user
-# grants, browse role (non-propagating), via a dedicated group.
-- name: team-admins
+# grants, browse role (non-propagating), via nested internal_groups -- the two
+# per-controller leaf groups just hold membership, the umbrella group grants
+# the actual role by referencing them via internal_groups.
+- name: oc-team-admins
   members:
-    users:
-    - team-a-admin@444666.best
-    - team-b-admin@444666.best
+    internal_groups:
+    - oc-team-a-admins
+    - oc-team-b-admins
   roles:
   - name: browse
     grantedAt: current
     propagates: false
+- name: oc-team-a-admins
+  members:
+    users:
+    - team-a-admin@444666.best
+- name: oc-team-b-admins
+  members:
+    users:
+    - team-b-admin@444666.best
