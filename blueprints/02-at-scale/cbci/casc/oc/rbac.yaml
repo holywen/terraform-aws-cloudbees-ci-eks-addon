@@ -168,8 +168,15 @@ groups:
   # develop/administer (or restore the original sa-token-manager role from
   # Test 1/Test 2, since removed from this file) if a specific root-level
   # capability needs demoing.
+  #
+  # TEMPORARY TEST (2026-09-29): added propagates: false to directly verify
+  # whether this actually blocks item-level visibility for a root-scoped
+  # browse grant, before writing a claim about oc-team-admins's identical
+  # pattern into D1/D2. Revert to non-propagating -> propagating (or remove
+  # this line) once the check is done.
   - name: browse
     grantedAt: current
+    propagates: false
   name: entra-sa-root-group
 # Customer_Guide_Test3_EndUser_OIDC_EntraID.md, Part A Step 3 (2026-09-29):
 # direct per-user grant for the real Entra ID human identity now used to log
