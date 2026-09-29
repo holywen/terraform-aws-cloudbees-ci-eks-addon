@@ -45,6 +45,19 @@ serviceAccounts:
 # mc-parent provisions its own independently-evaluated copy of these SAs/roles/groups
 # -- this is centralized authoring with per-controller local evaluation, not one shared
 # identity reachable across controllers (confirmed: Test1_Results_Ticket_277627_CreateToken_Scoping.md).
+#
+# The four *-oidc-sa entries use Entra ID (this environment's confirmed human-login IdP,
+# per D1's recommendation), NOT the EKS OIDC issuer used elsewhere in this file for
+# K8s-ServiceAccount-based testing -- each is backed by its own real, dedicated Azure AD
+# app registration (tenant 97f9ccac-e200-42e0-b725-6e50e4d235b8), created specifically
+# for this test, following the exact self-referential client-credentials pattern already
+# proven working for entra-oidc-sa (oc/rbac.yaml, items.squad_y-folder.yaml): `subject`
+# is the app's own service-principal object ID, `audience` is the app's own client
+# (appId), and the app requests a token scoped to its own `<appId>/.default` --
+# confirmed live via a real client-credentials token exchange, decoded, before wiring
+# in below (iss/sub/aud/ver all matched). App registrations: cbci-keysight-admins-sa /
+# -power-users-sa / -developers-sa / -browsers-sa. Client secrets exist in Azure (1-year
+# expiry) for live testing but are not stored in this repo.
 - name: admins-sa
   authentication:
   - type: password
@@ -54,9 +67,10 @@ serviceAccounts:
 - name: admins-oidc-sa
   authentication:
   - type: oidc
-    id: admins-oidc-cbci-bp02-ksight
-    issuer: "https://oidc.eks.us-west-2.amazonaws.com/id/7FB741C08C697CC22D9631DFCC3B71C8"
-    subject: "system:serviceaccount:cbci-sa-test:admins-oidc-sa"
+    id: admins-oidc-entra
+    issuer: "https://login.microsoftonline.com/97f9ccac-e200-42e0-b725-6e50e4d235b8/v2.0"
+    subject: "97abd13b-4a87-4857-bda7-6dc874ef078c"
+    audience: "a883906a-ae3e-48df-8dda-fc605f5dc2a2"
 - name: power-users-sa
   authentication:
   - type: password
@@ -66,9 +80,10 @@ serviceAccounts:
 - name: power-users-oidc-sa
   authentication:
   - type: oidc
-    id: power-users-oidc-cbci-bp02-ksight
-    issuer: "https://oidc.eks.us-west-2.amazonaws.com/id/7FB741C08C697CC22D9631DFCC3B71C8"
-    subject: "system:serviceaccount:cbci-sa-test:power-users-oidc-sa"
+    id: power-users-oidc-entra
+    issuer: "https://login.microsoftonline.com/97f9ccac-e200-42e0-b725-6e50e4d235b8/v2.0"
+    subject: "0a9430a2-8b20-422e-9e33-20a243b59b58"
+    audience: "76a998a6-b20b-4ac0-a5da-959e063a9537"
 - name: developers-sa
   authentication:
   - type: password
@@ -78,9 +93,10 @@ serviceAccounts:
 - name: developers-oidc-sa
   authentication:
   - type: oidc
-    id: developers-oidc-cbci-bp02-ksight
-    issuer: "https://oidc.eks.us-west-2.amazonaws.com/id/7FB741C08C697CC22D9631DFCC3B71C8"
-    subject: "system:serviceaccount:cbci-sa-test:developers-oidc-sa"
+    id: developers-oidc-entra
+    issuer: "https://login.microsoftonline.com/97f9ccac-e200-42e0-b725-6e50e4d235b8/v2.0"
+    subject: "7dc13da2-e491-4c13-8487-f04d473f13d9"
+    audience: "d9c9728b-f3c5-4229-8ae7-91a9f3b25dcd"
 - name: browsers-sa
   authentication:
   - type: password
@@ -90,9 +106,10 @@ serviceAccounts:
 - name: browsers-oidc-sa
   authentication:
   - type: oidc
-    id: browsers-oidc-cbci-bp02-ksight
-    issuer: "https://oidc.eks.us-west-2.amazonaws.com/id/7FB741C08C697CC22D9631DFCC3B71C8"
-    subject: "system:serviceaccount:cbci-sa-test:browsers-oidc-sa"
+    id: browsers-oidc-entra
+    issuer: "https://login.microsoftonline.com/97f9ccac-e200-42e0-b725-6e50e4d235b8/v2.0"
+    subject: "218285ad-ec00-4e67-adb4-3069d4f376d4"
+    audience: "6d6280f3-bc12-45ba-98f6-3e971f79f98a"
 roles:
 - name: authenticated
 - permissions:
