@@ -1,0 +1,28 @@
+# Local rbac.yaml for the mc-ha bundle (2026-09-29). mc-ha has `parent: mc-parent`
+# (bundle.yaml), so this file is MERGED with mc-parent's own rbac.yaml on every
+# controller using mc-ha -- not a replacement of it. The "Admins" role referenced
+# below is defined in mc-parent/rbac.yaml (Keysight AAA R1); since parent-bundle
+# inheritance merges into one effective, controller-local RBAC config (confirmed via
+# each controller's own consolidated core-casc-bundle/rbac/*.yaml), granting that
+# role here works the same as if it were defined directly in this file -- this is
+# NOT the OC-central-role-resolution mechanism (D1 F3), it's simple same-database
+# local merge, so it does not depend on securitySettingsEnforcement.global at all.
+#
+# Distinct name/id from mc-parent's own admins-sa/admins-oidc-sa deliberately --
+# this is a SEPARATE local admin identity that exists only on mc-ha bundle
+# controllers, not the shared R1 role-based accounts.
+serviceAccounts:
+- name: mc-ha-admin-sa
+  authentication:
+  - type: password
+    id: mc-ha-admin-sa-token
+    description: "Local admin service account for mc-ha bundle controllers."
+    password: cloudbees_ci_sa_354f22437d719e1f174c0d2a8098be25
+groups:
+- members:
+    serviceAccounts:
+    - mc-ha-admin-sa
+  roles:
+  - name: "Admins"
+    grantedAt: current
+  name: mc-ha-admin-service-accounts

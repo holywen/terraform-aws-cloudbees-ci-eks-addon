@@ -1,0 +1,31 @@
+# Local rbac.yaml for the mc-none-ha bundle (2026-09-29). mc-none-ha has
+# `parent: mc-parent` (bundle.yaml), so this file is MERGED with mc-parent's own
+# rbac.yaml on every controller using mc-none-ha (team-a, team-b in this
+# environment) -- not a replacement of it. The "Admins" role referenced below is
+# defined in mc-parent/rbac.yaml (Keysight AAA R1); since parent-bundle inheritance
+# merges into one effective, controller-local RBAC config (confirmed via each
+# controller's own consolidated core-casc-bundle/rbac/*.yaml), granting that role
+# here works the same as if it were defined directly in this file -- this is NOT
+# the OC-central-role-resolution mechanism (D1 F3), it's simple same-database
+# local merge, so it does not depend on securitySettingsEnforcement.global at all.
+#
+# Distinct name/id from mc-parent's own admins-sa/admins-oidc-sa deliberately --
+# this is a SEPARATE local admin identity, one independently-provisioned copy per
+# controller using this bundle (team-a and team-b each get their own, per the
+# shared-template pattern documented throughout this engagement), not the shared
+# R1 role-based accounts.
+serviceAccounts:
+- name: mc-none-ha-admin-sa
+  authentication:
+  - type: password
+    id: mc-none-ha-admin-sa-token
+    description: "Local admin service account for mc-none-ha bundle controllers."
+    password: cloudbees_ci_sa_a4eba4167928af91aaed0a81682becd8
+groups:
+- members:
+    serviceAccounts:
+    - mc-none-ha-admin-sa
+  roles:
+  - name: "Admins"
+    grantedAt: current
+  name: mc-none-ha-admin-service-accounts
