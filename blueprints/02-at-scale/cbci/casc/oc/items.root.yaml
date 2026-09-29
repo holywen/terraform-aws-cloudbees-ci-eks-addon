@@ -54,6 +54,17 @@ items:
     properties:
       - configurationAsCode:
           bundle: "${cascBranch}/mc-none-ha"
+    # User-requested (2026-09-29): item-scoped administer grant for team-a,
+    # via the OC-level oc-team-a-admins internal_group (referenced by name,
+    # not redeclared here).
+    groups:
+    - name: oc_item-team-a-admins
+      members:
+        internal_groups:
+        - oc-team-a-admins
+      roles:
+      - name: administer
+        grantedAt: current
   # Casc, Non-HA
   - kind: managedController
     name: team-b
@@ -98,6 +109,17 @@ items:
     properties:
       - configurationAsCode:
           bundle: "${cascBranch}/mc-none-ha"
+    # User-requested (2026-09-29): item-scoped administer grant for team-b,
+    # via the OC-level oc-team-b-admins internal_group (referenced by name,
+    # not redeclared here).
+    groups:
+    - name: oc_item-team-b-admins
+      members:
+        internal_groups:
+        - oc-team-b-admins
+      roles:
+      - name: administer
+        grantedAt: current
   # Casc, HA
   # team-c-ha REMOVED (isolated) from this bundle: a genuine CloudBees product
   # bug in the master-provisioning-kubernetes plugin's HPA reconciliation
