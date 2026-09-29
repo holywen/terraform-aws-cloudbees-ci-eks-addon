@@ -24,6 +24,11 @@ plugins:
   - id: mcp-server
   - id: mock-load-builder
   - id: momentjs
+  # Customer_Guide_Test3_EndUser_OIDC_EntraID.md, Part B Step 1 (2026-09-29):
+  # required on managed controllers too for the OC->controller SSO relay
+  # (securityRealm: "operationsCenter") to function -- SSO plugins must be
+  # installed on both sides, per CloudBees's own documentation.
+  - id: oic-auth
   - id: opentelemetry
   - id: operations-center-notification
   - id: pipeline-event-step

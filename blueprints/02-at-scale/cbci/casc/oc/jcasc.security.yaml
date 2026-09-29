@@ -11,13 +11,28 @@
 # Test5_Results_SecurityEnforcement_OptOut.md for the history behind this split.
 jenkins:
   securityRealm:
-    ldap:
-      configurations:
-      - managerDN: ${ldapManagerDN}
-        managerPasswordSecret: ${sec_globalPassword}
-        rootDN: ${ldapRootDN}
-        server: ${ldapServer}
-        userSearch: ${ldapUserSearch}
+    # Customer_Guide_Test3_EndUser_OIDC_EntraID.md, Part A Step 2 (2026-09-29):
+    # switched from the LDAP realm to Entra ID OIDC end-user login, per the
+    # customer guide's documented, verified-working configuration. App
+    # registration "cbci-oc-enduser-oidc" (appId 5fda9a1e-b491-41ff-9ddd-5c5dcdf26282),
+    # Authorization Code flow, redirect URI
+    # https://cjoc.cidemo.swen.aws.ps.beescloud.com/securityRealm/finishLogin.
+    # NOTE: this replaces LDAP as the OC's ONLY interactive-login realm -- the
+    # LDAP admin account (admin_cbci_a) no longer has a matching login path.
+    # RBAC access after this switch comes from the new group grant added below
+    # in rbac.yaml (holywen@hotmail.com -> administer), matching the same real,
+    # already-tested Entra identity used in Test3's own verification.
+    oic:
+      clientId: "5fda9a1e-b491-41ff-9ddd-5c5dcdf26282"
+      clientSecret: "${sec_oicClientSecret}"
+      serverConfiguration:
+        wellKnown:
+          wellKnownOpenIDConfigurationUrl: "https://login.microsoftonline.com/97f9ccac-e200-42e0-b725-6e50e4d235b8/v2.0/.well-known/openid-configuration"
+          scopesOverride: "openid profile email"
+      userNameField: "preferred_username"
+      fullNameFieldName: "name"
+      emailFieldName: "email"
+      logoutFromOpenidProvider: true
   authorizationStrategy: "cloudBeesRoleBasedAccessControl"
   remotingSecurity:
     enabled: true

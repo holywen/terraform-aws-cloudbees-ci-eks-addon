@@ -9,5 +9,8 @@ plugins:
   - id: jsch
   - id: ldap
   - id: mcp-server
+  # Customer_Guide_Test3_EndUser_OIDC_EntraID.md, Part A Step 2 (2026-09-29):
+  # required for the OC's own end-user OIDC (Entra ID) login realm below.
+  - id: oic-auth
   - id: popper2-api
   - id: sshd
