@@ -19,12 +19,14 @@
 # TEST 1 REDESIGN (2026-09-28/29): flipped to realmAndAuthorization,
 # single-variable change (nothing else touched), to re-run the sa-root/
 # teamA-sa/teamB-sa matrix under "SSO + RBAC" for direct comparison against
-# the realmOnly results already captured. See
+# the realmOnly results already captured. Results identical to realmOnly in
+# every scenario. Reverted back to realmOnly afterward, this environment's
+# established baseline (no per-controller opt-out step needed at scale). See
 # Test1_Results_Ticket_277627_CreateToken_Scoping.md.
 security:
   securitySettingsEnforcement:
     global:
-      realmAndAuthorization:
+      realmOnly:
         canOverride: true
 jenkins:
   securityRealm:
