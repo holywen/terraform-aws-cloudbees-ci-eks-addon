@@ -1,0 +1,32 @@
+# ACTIVE enforcement-mode file. This is a plain copy of one of the two
+# variants in the sibling `oc-jcasc-security-modes/` directory (NOT part of
+# this bundle -- kept there specifically so it's never "present but
+# unreferenced" inside this bundle folder, which CloudBees's bundle
+# validator treats as fatal for promotion, rejecting the ENTIRE bundle even
+# though every other check passes -- confirmed live, 2026-09-29, this was
+# the cause of a full bundle-promotion failure the first time both mode
+# files were kept side by side in this folder).
+#
+# TO SWITCH MODE: copy the other variant over this file, e.g.
+#   cp ../oc-jcasc-security-modes/realmAndAuthorization.yaml jcasc.security-mode.yaml
+# then bump bundle.yaml's version and redeploy (cjoc-0 restart, then restart
+# any managed controller pods that need to pick up the change). No hand-
+# editing of the enforcement block itself required -- just copy a pre-built,
+# already-validated file.
+#
+# Currently active: realmOnly ("SSO only") -- this environment's established
+# baseline (no per-controller opt-out UI step needed at scale -- finding #13
+# in Secondary_Findings_Product_Bugs.md).
+#
+# securitySettingsEnforcement.global picks ONE of realmAndAuthorization /
+# realmOnly / noSecurityEnforcer -- confirmed live against this OC's own
+# /configuration-as-code/schema (2026-09-24, chart 3.37914.0+c9bda104ea71).
+# Confirmed via Test5_Results_SecurityEnforcement_OptOut.md Follow-up #7 and
+# Test1_Results_Ticket_277627_CreateToken_Scoping.md's Test 1 redesign that
+# enforcement mode makes zero difference to every RBAC reach/isolation
+# question tested so far -- both modes behave identically on every axis.
+security:
+  securitySettingsEnforcement:
+    global:
+      realmOnly:
+        canOverride: true

@@ -1,14 +1,16 @@
 apiVersion: "2"
 id: "oc"
-version: "32"
+version: "33"
 jcasc:
   - jcasc.main.yaml
   - jcasc.security.yaml
-  # Enforcement mode -- swap this one line to switch between "SSO only" and
-  # "SSO + RBAC" without touching any content: use
-  # jcasc.security-mode.realmOnly.yaml (current) or
-  # jcasc.security-mode.realmAndAuthorization.yaml.
-  - jcasc.security-mode.realmOnly.yaml
+  # Enforcement mode -- a fixed filename, its CONTENT is swapped by copying
+  # from ../oc-jcasc-security-modes/{realmOnly,realmAndAuthorization}.yaml.
+  # Do NOT reference the two variants directly here -- CloudBees's bundle
+  # validator rejects the whole bundle if a file sits in this folder
+  # unreferenced, so only ever one enforcement-mode file may live in oc/ at
+  # a time. See jcasc.security-mode.yaml's own header for the switch steps.
+  - jcasc.security-mode.yaml
   - jcasc.k8s-agents.yaml
   - jcasc.support.yaml
 items:

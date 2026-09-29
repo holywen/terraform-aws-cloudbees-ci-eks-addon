@@ -1,0 +1,15 @@
+# Reference copy: "SSO + RBAC" enforcement mode. NOT part of the OC's CasC
+# bundle (this directory, oc-jcasc-security-modes/, sits OUTSIDE oc/
+# deliberately -- CloudBees's bundle validator rejects the entire bundle if
+# any file inside the bundle folder is present but unreferenced in
+# bundle.yaml, so this variant must live somewhere the bundle never scans).
+#
+# TO ACTIVATE: from blueprints/02-at-scale/cbci/casc/, run
+#   cp oc-jcasc-security-modes/realmAndAuthorization.yaml oc/jcasc.security-mode.yaml
+# then bump oc/bundle.yaml's version and redeploy. See
+# oc/jcasc.security-mode.yaml's own header for the full mechanism.
+security:
+  securitySettingsEnforcement:
+    global:
+      realmAndAuthorization:
+        canOverride: true
