@@ -21,6 +21,40 @@ removeStrategy:
 serviceAccountOidcIssuerDomains:
   - amazonaws.com
   - login.microsoftonline.com
+# Moved here 2026-09-29 from mc-parent/rbac.yaml, per user request: these four
+# OIDC service accounts are now team-b-only (mc-none-ha is no longer shared
+# with team-a, which moved to mc-ha), not centrally shared via mc-parent.
+# Same real Entra ID app registrations as before the move -- credentials
+# unchanged, only their CasC declaration location changed.
+serviceAccounts:
+- name: admins-oidc-sa
+  authentication:
+  - type: oidc
+    id: admins-oidc-entra
+    issuer: "https://login.microsoftonline.com/97f9ccac-e200-42e0-b725-6e50e4d235b8/v2.0"
+    subject: "97abd13b-4a87-4857-bda7-6dc874ef078c"
+    audience: "a883906a-ae3e-48df-8dda-fc605f5dc2a2"
+- name: power-users-oidc-sa
+  authentication:
+  - type: oidc
+    id: power-users-oidc-entra
+    issuer: "https://login.microsoftonline.com/97f9ccac-e200-42e0-b725-6e50e4d235b8/v2.0"
+    subject: "0a9430a2-8b20-422e-9e33-20a243b59b58"
+    audience: "76a998a6-b20b-4ac0-a5da-959e063a9537"
+- name: developers-oidc-sa
+  authentication:
+  - type: oidc
+    id: developers-oidc-entra
+    issuer: "https://login.microsoftonline.com/97f9ccac-e200-42e0-b725-6e50e4d235b8/v2.0"
+    subject: "7dc13da2-e491-4c13-8487-f04d473f13d9"
+    audience: "d9c9728b-f3c5-4229-8ae7-91a9f3b25dcd"
+- name: browsers-oidc-sa
+  authentication:
+  - type: oidc
+    id: browsers-oidc-entra
+    issuer: "https://login.microsoftonline.com/97f9ccac-e200-42e0-b725-6e50e4d235b8/v2.0"
+    subject: "218285ad-ec00-4e67-adb4-3069d4f376d4"
+    audience: "6d6280f3-bc12-45ba-98f6-3e971f79f98a"
 # The "Admins" role referenced below is defined in mc-parent/rbac.yaml (Keysight AAA
 # R1); since parent-bundle inheritance merges into one effective, controller-local
 # RBAC config (confirmed via each controller's own consolidated
@@ -59,4 +93,33 @@ groups:
   roles:
   - name: administer
     grantedAt: current
+# Groups for the four OIDC service accounts moved here from mc-parent above.
+- members:
+    serviceAccounts:
+    - admins-oidc-sa
+  roles:
+  - name: "Admins"
+    grantedAt: current
+  name: admins-oidc-service-accounts
+- members:
+    serviceAccounts:
+    - power-users-oidc-sa
+  roles:
+  - name: "Power Users"
+    grantedAt: current
+  name: power-users-oidc-service-accounts
+- members:
+    serviceAccounts:
+    - developers-oidc-sa
+  roles:
+  - name: "Developers"
+    grantedAt: current
+  name: developers-oidc-service-accounts
+- members:
+    serviceAccounts:
+    - browsers-oidc-sa
+  roles:
+  - name: "Browsers"
+    grantedAt: current
+  name: browsers-oidc-service-accounts
 

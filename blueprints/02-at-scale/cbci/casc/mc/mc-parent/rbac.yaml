@@ -75,52 +75,29 @@ serviceAccounts:
   - type: password
     id: admins-sa-token
     description: "Password-authenticated service account for the Admins role."
-- name: admins-oidc-sa
-  authentication:
-  - type: oidc
-    id: admins-oidc-entra
-    issuer: "https://login.microsoftonline.com/97f9ccac-e200-42e0-b725-6e50e4d235b8/v2.0"
-    subject: "97abd13b-4a87-4857-bda7-6dc874ef078c"
-    audience: "a883906a-ae3e-48df-8dda-fc605f5dc2a2"
+# admins-oidc-sa MOVED 2026-09-29 to mc-none-ha/rbac.yaml (team-b-only), per
+# user request -- no longer shared via mc-parent.
 - name: power-users-sa
   # See admins-sa's comment above -- `password:` value removed 2026-09-29.
   authentication:
   - type: password
     id: power-users-sa-token
     description: "Password-authenticated service account for the Power Users role."
-- name: power-users-oidc-sa
-  authentication:
-  - type: oidc
-    id: power-users-oidc-entra
-    issuer: "https://login.microsoftonline.com/97f9ccac-e200-42e0-b725-6e50e4d235b8/v2.0"
-    subject: "0a9430a2-8b20-422e-9e33-20a243b59b58"
-    audience: "76a998a6-b20b-4ac0-a5da-959e063a9537"
+# power-users-oidc-sa MOVED 2026-09-29 to mc-none-ha/rbac.yaml.
 - name: developers-sa
   # See admins-sa's comment above -- `password:` value removed 2026-09-29.
   authentication:
   - type: password
     id: developers-sa-token
     description: "Password-authenticated service account for the Developers role."
-- name: developers-oidc-sa
-  authentication:
-  - type: oidc
-    id: developers-oidc-entra
-    issuer: "https://login.microsoftonline.com/97f9ccac-e200-42e0-b725-6e50e4d235b8/v2.0"
-    subject: "7dc13da2-e491-4c13-8487-f04d473f13d9"
-    audience: "d9c9728b-f3c5-4229-8ae7-91a9f3b25dcd"
+# developers-oidc-sa MOVED 2026-09-29 to mc-none-ha/rbac.yaml.
 - name: browsers-sa
   # See admins-sa's comment above -- `password:` value removed 2026-09-29.
   authentication:
   - type: password
     id: browsers-sa-token
     description: "Password-authenticated service account for the Browsers role."
-- name: browsers-oidc-sa
-  authentication:
-  - type: oidc
-    id: browsers-oidc-entra
-    issuer: "https://login.microsoftonline.com/97f9ccac-e200-42e0-b725-6e50e4d235b8/v2.0"
-    subject: "218285ad-ec00-4e67-adb4-3069d4f376d4"
-    audience: "6d6280f3-bc12-45ba-98f6-3e971f79f98a"
+# browsers-oidc-sa MOVED 2026-09-29 to mc-none-ha/rbac.yaml.
 roles:
 - name: authenticated
 - permissions:
@@ -359,7 +336,6 @@ groups:
 - members:
     serviceAccounts:
     - admins-sa
-    - admins-oidc-sa
   roles:
   - name: "Admins"
     grantedAt: current
@@ -367,7 +343,6 @@ groups:
 - members:
     serviceAccounts:
     - power-users-sa
-    - power-users-oidc-sa
   roles:
   - name: "Power Users"
     grantedAt: current
@@ -375,7 +350,6 @@ groups:
 - members:
     serviceAccounts:
     - developers-sa
-    - developers-oidc-sa
   roles:
   - name: "Developers"
     grantedAt: current
@@ -383,7 +357,6 @@ groups:
 - members:
     serviceAccounts:
     - browsers-sa
-    - browsers-oidc-sa
   roles:
   - name: "Browsers"
     grantedAt: current

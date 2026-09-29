@@ -22,6 +22,42 @@ removeStrategy:
 serviceAccountOidcIssuerDomains:
   - amazonaws.com
   - login.microsoftonline.com
+# Four NEW OIDC service accounts, team-a-only (2026-09-29, per user request) --
+# distinct Azure AD app registrations from mc-none-ha's (team-b's) *-oidc-sa
+# accounts, same self-referential client-credentials pattern (subject = own
+# service-principal object ID, audience = own client ID), each with
+# requestedAccessTokenVersion=2 set so the token's issuer matches this
+# environment's configured v2.0 issuer. App registrations:
+# cbci-keysight-teama-admins-sa / -power-users-sa / -developers-sa / -browsers-sa.
+serviceAccounts:
+- name: admins-oidc-sa
+  authentication:
+  - type: oidc
+    id: teama-admins-oidc-entra
+    issuer: "https://login.microsoftonline.com/97f9ccac-e200-42e0-b725-6e50e4d235b8/v2.0"
+    subject: "841ace97-ce95-4046-a845-539695c82f3a"
+    audience: "b35ff691-069a-44f4-addd-dec0d427b058"
+- name: power-users-oidc-sa
+  authentication:
+  - type: oidc
+    id: teama-power-users-oidc-entra
+    issuer: "https://login.microsoftonline.com/97f9ccac-e200-42e0-b725-6e50e4d235b8/v2.0"
+    subject: "ef780550-cc26-4c17-a2a8-b36a7ef2c494"
+    audience: "7fa6f79b-f4d7-454f-acb4-1f26d0ae66b2"
+- name: developers-oidc-sa
+  authentication:
+  - type: oidc
+    id: teama-developers-oidc-entra
+    issuer: "https://login.microsoftonline.com/97f9ccac-e200-42e0-b725-6e50e4d235b8/v2.0"
+    subject: "57d4e0c9-4c3e-484d-af5d-be13ef6c9a4d"
+    audience: "e85677d4-34c9-4885-9867-d622cc285305"
+- name: browsers-oidc-sa
+  authentication:
+  - type: oidc
+    id: teama-browsers-oidc-entra
+    issuer: "https://login.microsoftonline.com/97f9ccac-e200-42e0-b725-6e50e4d235b8/v2.0"
+    subject: "3a078dd7-ae10-4005-9301-d33b5c0e0988"
+    audience: "fb5eaad7-3c12-4f4c-84df-3e494c30c64f"
 # The "Admins" role referenced below is defined in mc-parent/rbac.yaml (Keysight AAA
 # R1); since parent-bundle inheritance merges into one effective, controller-local
 # RBAC config (confirmed via each controller's own consolidated
@@ -59,4 +95,33 @@ groups:
   roles:
   - name: administer
     grantedAt: current
+# Groups for the four new team-a-only OIDC service accounts above.
+- members:
+    serviceAccounts:
+    - admins-oidc-sa
+  roles:
+  - name: "Admins"
+    grantedAt: current
+  name: admins-oidc-service-accounts
+- members:
+    serviceAccounts:
+    - power-users-oidc-sa
+  roles:
+  - name: "Power Users"
+    grantedAt: current
+  name: power-users-oidc-service-accounts
+- members:
+    serviceAccounts:
+    - developers-oidc-sa
+  roles:
+  - name: "Developers"
+    grantedAt: current
+  name: developers-oidc-service-accounts
+- members:
+    serviceAccounts:
+    - browsers-oidc-sa
+  roles:
+  - name: "Browsers"
+    grantedAt: current
+  name: browsers-oidc-service-accounts
 
