@@ -18,11 +18,13 @@ unclassified:
                     depth: 1
                     noTags: false
                     shallow: true
-cloudbees-pipeline-policies:
-  config:
-    policies:
-    - action: "warning"
-      customMessage: "Use steps compatible with HA/HS controllers"
-      name: "HA - Controllers"
-      rules:
-      - "hARule"
+# cloudbees-pipeline-policies block REMOVED 2026-09-29: referenced a rule named
+# literally "hARule", which is not any real com.cloudbees.pipeline.rules
+# implementation -- a placeholder that was never filled in with a genuine rule
+# ID. Never caught before because mc-ha had no live controller in this
+# environment to actually boot it until team-a was reassigned here; the
+# reassignment immediately hard-failed CasC (`UnknownAttributesException: No
+# ...RulesInterceptionRule implementation found for hARule`, BootFailure).
+# Restore with a real rule ID if HA-specific pipeline-policy enforcement is
+# actually wanted.
+
