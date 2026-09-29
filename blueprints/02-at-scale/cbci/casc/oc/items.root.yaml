@@ -54,20 +54,6 @@ items:
     properties:
       - configurationAsCode:
           bundle: "${cascBranch}/mc-none-ha"
-    # TEST 1 follow-up (2026-09-29): Part 1 item-scoped fixture -- ca-target-sa
-    # (target only) plus team-a-token-managers (grants sa-token-manager to
-    # sa-scope-test-item, scoped ONLY to this item).
-    serviceAccounts:
-    - name: ca-target-sa
-      authentication: []
-    groups:
-    - name: team-a-token-managers
-      roles:
-      - name: sa-token-manager
-        grantedAt: current
-      members:
-        serviceAccounts:
-        - sa-scope-test-item
   # Casc, Non-HA
   - kind: managedController
     name: team-b
@@ -112,11 +98,6 @@ items:
     properties:
       - configurationAsCode:
           bundle: "${cascBranch}/mc-none-ha"
-    # TEST 1 follow-up (2026-09-29): Part 1 item-scoped target on the sibling
-    # item, used for the cross-item check.
-    serviceAccounts:
-    - name: cb-target-sa
-      authentication: []
   # Casc, HA
   # team-c-ha REMOVED (isolated) from this bundle: a genuine CloudBees product
   # bug in the master-provisioning-kubernetes plugin's HPA reconciliation
