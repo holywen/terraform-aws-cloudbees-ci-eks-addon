@@ -142,6 +142,20 @@ serviceAccounts:
     issuer: "https://login.microsoftonline.com/97f9ccac-e200-42e0-b725-6e50e4d235b8/v2.0"
     subject: "80829c76-7168-4889-af8b-80570637964d"
     audience: "bbd6d52f-32dc-467c-956b-807734dad4ba"
+# TEMPORARY, added 2026-09-30 at explicit user request: root-scoped Administer
+# access for a peer Claude session ("inactive-items-cluster-ops") testing an
+# Inactive Items cleanup Groovy script. This is a live-authored password value
+# via CasC (${sec_peerAdminOcSaPassword}, patched directly into the
+# cbci-sec-casc k8s Secret, NOT yet wired through Terraform's
+# k8s/secrets-values.yml -- same gap already flagged for sec_oicClientSecret,
+# see that variable's own history). Intended to be REVOKED (delete this SA +
+# its group, redeploy) once that peer session's validation is done -- do not
+# let this linger as a standing credential.
+- name: peer-admin-oc-sa
+  authentication:
+  - type: password
+    id: peer-admin-oc-sa-pw
+    password: "${sec_peerAdminOcSaPassword}"
 groups:
 - members:
     external_groups:
@@ -202,3 +216,11 @@ groups:
   members:
     users:
     - team-b-admin@444666.best
+# See peer-admin-oc-sa's own definition comment above -- TEMPORARY grant, revoke together.
+- name: peer-admin-oc-sa-group
+  members:
+    serviceAccounts:
+    - peer-admin-oc-sa
+  roles:
+  - name: administer
+    grantedAt: current
