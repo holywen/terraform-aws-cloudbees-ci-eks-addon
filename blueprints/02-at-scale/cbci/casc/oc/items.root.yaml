@@ -10,8 +10,16 @@ items:
         memory: 2048
         cpus: 1.0
         disk: 10
-        nodeSelectors: topology.kubernetes.io/zone=${sec_awsRegion}a,role=cb-apps
-        storageClassName: "gp3-a"
+        # TEMPORARY HA TEST (2026-10-12): multi-replica HA needs a Deployment + RWX
+        # storage (EFS), not the single-AZ EBS StatefulSet used before. Revert to
+        # nodeSelectors zone=${sec_awsRegion}a,role=cb-apps / gp3-a / StatefulSet afterwards.
+        nodeSelectors: role=cb-apps
+        storageClassName: "efs"
+        replication:
+          config:
+            maxReplicas: 4
+            replicas: 2
+            targetCPUUtilizationPercentage: 50
         # Mount the shared secrets volume (team-b/team-c-ha already had this;
         # team-a was missing it). Without it, sec_-prefixed CasC secret
         # variables (e.g. sec_adminMail, used by mc-parent's jcasc.support.yaml
@@ -24,7 +32,7 @@ items:
         yaml: |-
           ---
           apiVersion: "apps/v1"
-          kind: "StatefulSet"
+          kind: "Deployment"
           spec:
             template:
               spec:
