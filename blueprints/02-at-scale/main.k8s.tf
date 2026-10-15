@@ -157,8 +157,9 @@ module "eks_blueprints_addons" {
       configuration_values = jsonencode({
         enableWindowsIpam = "true"
         env = {
-          ENABLE_PREFIX_DELEGATION = "true"
-          WARM_PREFIX_TARGET       = "1"
+          # TEST BRANCH: prefix delegation off. In the small /24 private subnets it ran out of contiguous /28 blocks
+          # ("failed to assign an IP address to container"). Secondary-IP mode caps this instance size at 58 pods/node.
+          ENABLE_PREFIX_DELEGATION = "false"
         }
       })
     }

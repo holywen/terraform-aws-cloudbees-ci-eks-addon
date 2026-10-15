@@ -8,5 +8,7 @@ nodeSelector:
 
 kubectl:
   image:
+    # Bitnami removed its versioned tags from docker.io/bitnami in 2025; the same tag is kept in bitnamilegacy.
+    repository: docker.io/bitnamilegacy/kubectl
     #Issue #60
     tag: 1.26.14-debian-11-r6
