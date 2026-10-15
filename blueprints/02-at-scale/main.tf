@@ -408,7 +408,7 @@ resource "aws_backup_selection" "efs_backup_selection" {
 }
 
 resource "aws_iam_role" "backup_role" {
-  name = "efs-backup-role"
+  name = "efs-backup-role-${local.name}" # IAM role names are account-global: avoid clashing with other copies of this blueprint
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
