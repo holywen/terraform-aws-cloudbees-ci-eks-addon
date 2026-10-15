@@ -60,7 +60,9 @@ resource "kubernetes_resource_quota_v1" "agent_cap" {
 }
 
 # ResourceQuota on requests.* rejects pods without requests, so default them (agent containers
-# such as jnlp often have none).
+# such as jnlp often have none). Only default_request is set on purpose: a default limit (cpu)
+# lower than a template's explicit request makes the API server reject the pod as invalid
+# ("requests: must be less than or equal to cpu limit"), which the plugin turns into back-off.
 resource "kubernetes_limit_range_v1" "agent_cap" {
   for_each = local.agent_caps
 
@@ -75,10 +77,6 @@ resource "kubernetes_limit_range_v1" "agent_cap" {
       default_request = {
         cpu    = "100m"
         memory = "128Mi"
-      }
-      default = {
-        cpu    = "500m"
-        memory = "512Mi"
       }
     }
   }
