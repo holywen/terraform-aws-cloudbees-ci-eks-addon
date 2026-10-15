@@ -98,6 +98,7 @@ module "eks_blueprints_addon_cbci" {
     awsRegion       = var.aws_region
     adminMail       = var.trial_license["email"]
     grafana_url     = local.grafana_url
+    oicClientSecret = var.oic_client_secret
   })
 
   create_reg_secret = true

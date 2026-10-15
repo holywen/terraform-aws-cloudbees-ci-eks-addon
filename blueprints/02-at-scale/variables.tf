@@ -22,6 +22,12 @@ variable "dh_reg_secret_auth" {
   }
 }
 
+variable "oic_client_secret" {
+  description = "Client secret of the Entra ID app registration used by the Operations Center end-user OIDC login (cbci-oc-enduser-oidc). Injected into the cbci-sec-casc secret as sec_oicClientSecret and referenced by oc/jcasc.security.yaml."
+  type        = string
+  sensitive   = true
+}
+
 ############
 # Optional
 ############

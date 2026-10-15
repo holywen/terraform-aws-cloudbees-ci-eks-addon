@@ -13,6 +13,8 @@ dh_reg_secret_auth = { # Required.
   email    = "foo.bar@acme.com"
 }
 
+oic_client_secret = "changeme" # Required. Entra ID client secret for the Operations Center end-user OIDC login (sec_oicClientSecret).
+
 # tags = {  # Optional. Tags for the resources created. Default set to empty. Shared among all.
 #   "cb-owner" : "team-services"
 #   "cb-user" : "demo-user"
