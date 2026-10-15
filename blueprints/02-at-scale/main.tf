@@ -140,7 +140,7 @@ module "eks" {
     # Note: Openldap requires x86_64 architecture
     shared_apps = {
       node_group_name = "shared"
-      instance_types  = ["m7a.2xlarge"]
+      instance_types  = ["m7i.2xlarge"] # m7a is not offered in ap-southeast-1
       ami_type        = "BOTTLEROCKET_x86_64"
       platform        = "bottlerocket"
       min_size        = 1
