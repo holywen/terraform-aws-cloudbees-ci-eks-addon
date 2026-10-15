@@ -8,7 +8,7 @@
 
 locals {
   # One entry per (controller, cloud). Key = namespace suffix and cloud name in CasC.
-  # pods: hard cap for count/pods (the "container cap" equivalent).
+  # pods: hard cap on non-terminal pods (the "container cap" equivalent).
   # cpu/memory: optional requests ceiling, protects the node pools from a few large pods.
   agent_caps = {
     "team-b-linux" = {
@@ -52,7 +52,9 @@ resource "kubernetes_resource_quota_v1" "agent_cap" {
 
   spec {
     hard = {
-      "count/pods"      = each.value.pods
+      # "pods" counts only non-terminal pods. "count/pods" would also count Completed/Failed pods that
+      # nobody deleted (measured: it stays at the cap with one Running and one Completed pod).
+      "pods"            = each.value.pods
       "requests.cpu"    = each.value.cpu
       "requests.memory" = each.value.memory
     }
