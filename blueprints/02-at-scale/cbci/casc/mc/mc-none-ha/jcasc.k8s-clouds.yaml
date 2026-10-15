@@ -33,7 +33,7 @@ jenkins:
             - effect: "NoSchedule"
               key: "dedicated"
               operator: "Equal"
-              value: "build-linux"
+              value: "linux-builds"
   - kubernetes:
       name: "k8s-linux-xl"
       namespace: "${agentNsLinuxXl}"
@@ -65,4 +65,4 @@ jenkins:
             - effect: "NoSchedule"
               key: "dedicated"
               operator: "Equal"
-              value: "build-linux"
+              value: "linux-builds"

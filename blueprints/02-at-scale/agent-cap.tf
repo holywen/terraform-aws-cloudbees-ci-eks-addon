@@ -4,7 +4,7 @@
 # (controller, cloud) pair gets its own agent namespace. A ResourceQuota on that namespace is the
 # cap, enforced by the API server. The plugin cap (containerCapStr) stays unset in CasC.
 #
-# Status: UNTESTED draft. Not applied to any cluster.
+# Status: applied to a sandbox cluster (team-b only). Test results are in the engagement HOWTO.
 
 locals {
   # One entry per (controller, cloud). Key = namespace suffix and cloud name in CasC.
@@ -28,8 +28,6 @@ locals {
   }
 
   agent_cap_ns_prefix = "${local.cbci_agents_ns}-"
-  # ServiceAccount used by managed controllers to talk to the Kubernetes API (created by the CloudBees CI chart).
-  controller_sa_name = "jenkins"
 }
 
 resource "kubernetes_namespace_v1" "agent_cap" {
@@ -126,12 +124,12 @@ resource "kubernetes_role_binding_v1" "agent_cap_controller" {
     name      = kubernetes_role_v1.agent_cap_controller[each.key].metadata[0].name
   }
 
-  # Note: the controller SA lives in the CloudBees CI namespace. Per-controller isolation (one SA
-  # per controller) is not in scope for this test, so any controller SA can reach any capped
-  # namespace. See open questions in the how-to.
+  # Each managed controller runs as its own ServiceAccount in the CloudBees CI namespace, named
+  # after the controller (verified: team-b-0 runs as SA "team-b"). Binding only that SA keeps a
+  # controller out of the namespaces of the other controllers.
   subject {
     kind      = "ServiceAccount"
-    name      = local.controller_sa_name
+    name      = each.value.controller
     namespace = module.eks_blueprints_addon_cbci.cbci_namespace
   }
 }
