@@ -7,6 +7,5 @@ allowCapExceptions: true
 jcascMergeStrategy: "errorOnConflict"
 jcasc:
   - jcasc.main.yaml
-  - jcasc.k8s-clouds.yaml
 variables:
   - variables.yaml

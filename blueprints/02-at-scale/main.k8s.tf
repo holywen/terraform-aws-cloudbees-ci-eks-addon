@@ -100,7 +100,7 @@ module "eks_blueprints_addon_cbci" {
   create_pi_s3             = true
   pi_s3_bucket_arn         = module.cbci_s3_bucket.s3_bucket_arn
   pi_s3_bucket_cbci_prefix = local.cbci_s3_prefix
-  pi_s3_sa_controllers     = ["cjoc", "team-b", "team-c-ha"]
+  pi_s3_sa_controllers     = ["cjoc", "team-b"]
   create_pi_ecr            = true
   pi_ecr_cbci_agents_ns    = local.cbci_agents_ns
 

@@ -1,4 +1,4 @@
-# TEST BRANCH (test/agent-cap-k8s-native): Kubernetes-native cap on agents per controller per cloud.
+# TEST BRANCH (test-agent-cap): Kubernetes-native cap on agents per controller per cloud.
 #
 # Idea: instead of the kubernetes plugin container cap (KubernetesProvisioningLimits), every
 # (controller, cloud) pair gets its own agent namespace. A ResourceQuota on that namespace is the
@@ -24,13 +24,6 @@ locals {
       pods       = 2
       cpu        = "4"
       memory     = "8Gi"
-    }
-    "team-c-ha-linux" = {
-      controller = "team-c-ha"
-      cloud      = "k8s-linux"
-      pods       = 5
-      cpu        = "5"
-      memory     = "10Gi"
     }
   }
 
