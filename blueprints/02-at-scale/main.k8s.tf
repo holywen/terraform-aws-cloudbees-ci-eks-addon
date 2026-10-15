@@ -469,6 +469,6 @@ resource "terraform_data" "create_kubeconfig" {
   triggers_replace = var.ci ? [timestamp()] : []
 
   provisioner "local-exec" {
-    command = "aws eks update-kubeconfig --name ${module.eks.cluster_name} --region ${var.aws_region} --kubeconfig ${local.kubeconfig_file_path}"
+    command = "aws eks update-kubeconfig --name ${module.eks.cluster_name} --region ${var.aws_region} --kubeconfig \"${local.kubeconfig_file_path}\""
   }
 }
