@@ -19,7 +19,10 @@ part of this git repo) for the investigation write-ups.
 - `blueprints/01-getting-started/` — simple single-controller blueprint (LDAP realm). Not
   actively used for current testing; last known state: **fully destroyed** (0 resources
   in `terraform.tfstate`).
-- `blueprints/02-at-scale/` — the main testing ground. HA/multi-controller blueprint with:
+- `blueprints/02-at-scale/` — the main testing ground (last known state: **fully destroyed**
+  as of 2026-10-15 — state 0, EKS/VPC/LBs/EFS gone; a redeploy starts from scratch, so
+  EFS job data, runtime-minted tokens and in-cluster Vault/Velero contents are gone).
+  HA/multi-controller blueprint with:
   - `cbci/casc/oc/` — Operations Center CasC bundle (`bundle.yaml`, `rbac.yaml`,
     `items.root.yaml`, `jcasc.*.yaml`, `plugins.yaml`, `variables.yaml`).
   - `cbci/casc/mc/mc-parent/` — shared parent CasC bundle inherited by **all** managed
@@ -62,6 +65,19 @@ DESTROY_WL_ONLY=true  ROOT=02-at-scale make destroy   # workloads-only: removes 
 - This AWS account is **shared** across many teams' hosted zones/environments (visible via
   `aws route53 list-hosted-zones-by-name`) — always scope destructive AWS CLI actions to a
   specific resource ID, never a bulk/wildcard operation.
+- **Terraform ignores SSO if `~/.aws/credentials` has a stale static section** for the same
+  profile name: the AWS provider prefers the shared-credentials-file keys over
+  `AWS_PROFILE`/SSO, giving STS 403 `ExpiredToken` even though the AWS CLI works. Keep that
+  file free of a `[324005994172_infra-admin]` section, or work around it with
+  `eval "$(AWS_PROFILE=324005994172_infra-admin aws configure export-credentials --format env)"; unset AWS_PROFILE`.
+- **Outputs derived from `var.oic_client_secret` must be `sensitive = true`.** The secret
+  flows through `templatefile` into module outputs; root outputs interpolating them
+  (`cbci_oc_export_admin_crumb`, `cbci_oc_export_admin_api_token`, `global_password`) fail
+  plan/apply/destroy with "Output refers to sensitive values" otherwise.
+  `terraform output -raw` (used by `helpers.sh` `tf-output`) still works on sensitive outputs.
+- After a destroy, `resourcegroupstaggingapi get-resources` stays stale for a while
+  (terminated instances, deleted volumes/ENIs, KMS keys in PendingDeletion) — those are not
+  real leftovers; verify with the service-specific `describe-*`/`list-*` calls instead.
 - Full `terraform destroy` of `02-at-scale` takes ~20-25 minutes (EKS node group deletion
   and Helm release cleanup dominate). Run it backgrounded and poll the log rather than
   blocking.
@@ -91,6 +107,12 @@ DESTROY_WL_ONLY=true  ROOT=02-at-scale make destroy   # workloads-only: removes 
   bundle validator rejects the *entire* bundle if any file in the bundle folder is present
   but unreferenced in `bundle.yaml` (a real gotcha, confirmed live 2026-09-29), which is
   exactly why the inactive variant must live one level up.
+
+- **`removeStrategy: rbac: UPDATE` is deliberately set** in the controller RBAC fragments
+  (`mc-parent`, `mc-ha`, `mc-none-ha` `rbac.yaml`; commit `1d60b3e`). With the default
+  `SYNC`, password-SA tokens minted at runtime via `createToken` were lost on controller
+  restart; with `UPDATE` they survive plain and HA rolling restarts (F8). `oc/rbac.yaml` and
+  the items fragments stay `SYNC`. Don't revert it without re-testing token survival.
 
 ## Known product-side gotchas (see `Secondary_Findings_Product_Bugs.md` for full detail)
 
