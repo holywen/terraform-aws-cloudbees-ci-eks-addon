@@ -1,5 +1,5 @@
 removeStrategy:
-  rbac: SYNC
+  rbac: UPDATE
 # FIX confirmed 2026-09-25 (no longer an experiment -- keeping this as the permanent
 # baseline): serviceAccountOidcIssuerDomains, declared directly in a MANAGED
 # CONTROLLER's own rbac.yaml (mc-parent, shared by team-a/team-b), is now accepted with

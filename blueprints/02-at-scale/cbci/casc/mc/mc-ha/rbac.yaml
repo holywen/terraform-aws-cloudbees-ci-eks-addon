@@ -5,7 +5,7 @@
 # though mc-parent's own rbac.yaml already declares one, hard-fails CasC boot with
 # `CasCException: remove strategy is required` -- each merged fragment needs its own).
 removeStrategy:
-  rbac: SYNC
+  rbac: UPDATE
 # serviceAccountOidcIssuerDomains MUST be repeated in every merged rbac.yaml
 # fragment, not just the parent's -- confirmed live on mc-none-ha's sibling bundle
 # (2026-09-29): with a bundle-local rbac.yaml added (removeStrategy: SYNC, applied
