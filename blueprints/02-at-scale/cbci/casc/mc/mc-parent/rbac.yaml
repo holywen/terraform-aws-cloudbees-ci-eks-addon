@@ -99,7 +99,15 @@ serviceAccounts:
     description: "Password-authenticated service account for the Browsers role."
 # browsers-oidc-sa MOVED 2026-09-29 to mc-none-ha/rbac.yaml.
 roles:
+# `authenticated` MUST carry an explicit, minimal permission list under removeStrategy: UPDATE.
+# A bare `- name: authenticated` stub leaves a freshly-created controller's default
+# `authenticated` role (full Administer) untouched, so every logged-in identity -- including
+# the Browsers/Developers service accounts -- becomes an admin and the role gradient
+# collapses (found 2026-10-29 on a fresh redeploy; invisible on controllers whose role had
+# already been emptied under SYNC). Hudson.Read only = can log in, nothing else.
 - name: authenticated
+  permissions:
+  - hudson.model.Hudson.Read
 - permissions:
   - hudson.model.Computer.Connect
   - com.cloudbees.jenkins.plugins.casc.permissions.CascPermission.Item
