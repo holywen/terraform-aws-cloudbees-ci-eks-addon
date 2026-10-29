@@ -20,8 +20,8 @@ part of this git repo) for the investigation write-ups.
   actively used for current testing; last known state: **fully destroyed** (0 resources
   in `terraform.tfstate`).
 - `blueprints/02-at-scale/` — the main testing ground (last known state: **fully destroyed**
-  as of 2026-10-15 — state 0, EKS/VPC/LBs/EFS gone; a redeploy starts from scratch, so
-  EFS job data, runtime-minted tokens and in-cluster Vault/Velero contents are gone).
+  as of 2026-10-15, **redeployed 2026-10-29** and currently running; teardown again when the
+  demo is over: `CI=true DESTROY_WL_ONLY=false ROOT=02-at-scale make destroy`).
   HA/multi-controller blueprint with:
   - `cbci/casc/oc/` — Operations Center CasC bundle (`bundle.yaml`, `rbac.yaml`,
     `items.root.yaml`, `jcasc.*.yaml`, `plugins.yaml`, `variables.yaml`).
@@ -70,6 +70,10 @@ DESTROY_WL_ONLY=true  ROOT=02-at-scale make destroy   # workloads-only: removes 
   `AWS_PROFILE`/SSO, giving STS 403 `ExpiredToken` even though the AWS CLI works. Keep that
   file free of a `[324005994172_infra-admin]` section, or work around it with
   `eval "$(AWS_PROFILE=324005994172_infra-admin aws configure export-credentials --format env)"; unset AWS_PROFILE`.
+- **Fresh redeploy of `02-at-scale` (2026-10-29):** `terraform init` needs a CLI config that
+  bypasses the stale `~/.terraformrc` mirror; run `helm repo update` if the first apply fails
+  on `cloudbees-index.yaml`; `team-a` can be silently skipped by the OC (`approved=false`) —
+  remove its job dir on `cjoc-0` and restart the OC. Full steps: runbook Section 8.
 - **Outputs derived from `var.oic_client_secret` must be `sensitive = true`.** The secret
   flows through `templatefile` into module outputs; root outputs interpolating them
   (`cbci_oc_export_admin_crumb`, `cbci_oc_export_admin_api_token`, `global_password`) fail
@@ -113,6 +117,11 @@ DESTROY_WL_ONLY=true  ROOT=02-at-scale make destroy   # workloads-only: removes 
   `SYNC`, password-SA tokens minted at runtime via `createToken` were lost on controller
   restart; with `UPDATE` they survive plain and HA rolling restarts (F8). `oc/rbac.yaml` and
   the items fragments stay `SYNC`. Don't revert it without re-testing token survival.
+  **Caveat:** `UPDATE` is add-only, so on a *fresh* controller the default `authenticated`
+  role (full Administer) is never cleared and every account becomes admin. After a redeploy,
+  bootstrap once with `rbac: SYNC` in all three fragments (bump versions, push, restart OC +
+  controllers), then switch back to `UPDATE`. Check `authenticated` has 1 permission in
+  `nectar-rbac.xml`, not 51 (finding #24; runbook Section 8).
 
 ## Known product-side gotchas (see `Secondary_Findings_Product_Bugs.md` for full detail)
 
