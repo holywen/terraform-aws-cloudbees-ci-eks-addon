@@ -1,0 +1,3 @@
+controller_id,team_id,cost_centre,business_unit,valid_from
+team-a,team-apollo,CC-10001,Consumer Apps,2026-11-01
+team-b,team-boreas,CC-10002,Data Platform,2026-11-01

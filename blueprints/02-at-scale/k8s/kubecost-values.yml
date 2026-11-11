@@ -1,0 +1,46 @@
+# Kubecost 3.3.1 values for the chargeback lab (cur-kubecost-lab branch).
+# Registry overrides copied from the Amazon EKS cost monitoring values file:
+# https://raw.githubusercontent.com/kubecost/kubecost/refs/tags/v3.3.1/kubecost/values-eks-cost-monitoring.yaml
+# Cluster ID, cloud integration and storage class are set from Terraform (chargeback.tf).
+
+global:
+  imageRegistry: public.ecr.aws
+
+frontend:
+  image:
+    repository: kubecost/frontend
+
+aggregator:
+  image:
+    repository: kubecost/cost-model
+  # EKS bundle keeps 15 days of history; the export job is what keeps more.
+  retention1d: 16
+  # Lab only: no "helm.sh/resource-policy: keep", so terraform destroy removes the EBS volumes.
+  persistentConfigsStorage:
+    storageRequest: 1Gi
+    annotations: {}
+  aggregatorDbStorage:
+    storageRequest: 32Gi
+    annotations: {}
+
+forecasting:
+  image:
+    repository: kubecost/modeling
+
+# Network cost attribution is out of scope for the showback model.
+networkCosts:
+  enabled: false
+  image:
+    repository: kubecost/network-costs
+
+clusterController:
+  image:
+    repository: kubecost/cluster-controller
+
+finopsagent:
+  image:
+    repository: kubecost/agent
+
+mcp:
+  image:
+    repository: kubecost/mcp-kubecost
