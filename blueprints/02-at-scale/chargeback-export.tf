@@ -1,13 +1,27 @@
 # CHARGEBACK LAB (cur-kubecost-lab branch): daily showback export (plan test T4) and EFS usage (T3).
 #
-# Kubecost (EKS bundle) keeps 15 days of history. A CronJob exports one day of allocation data per
-# run to S3, attributed to controllers (chargeback/showback_export.py). EFS volumes expose no
-# used-bytes metric (verified in the lab), so the same pod measures each access point directory
-# with du first and adds it to the export.
+# Kubecost (EKS bundle) keeps 15 days of history and reconciles with CUR 12-36 h after usage. A
+# CronJob re-exports the last 3 days on every run (overwriting them) to S3, attributed to
+# controllers (chargeback/showback_export.py). Steps in one pod:
+#   efs-usage     du per EFS access point (EFS volumes expose no used-bytes metric)
+#   cur-external  CUR costs Kubecost does not see, through Athena (chargeback/cur_external.sh)
+#   export        Kubecost allocation + CUR -> showback CSV per day
+#   upload        everything under showback/date=YYYY-MM-DD/
 
 locals {
   cb_export_sa       = "showback-export"
   cb_export_schedule = "30 1 * * *" # 01:30 UTC, after the day closes
+  cb_export_days     = 3
+
+  # SQL condition that selects the cluster's resources in CUR. For PMI, use one cost allocation
+  # tag activated by the payer account: "resource_tags['user_<tag>'] = '<value>'". The lab account
+  # cannot activate tags, so it combines names it knows with two tags that are already active.
+  cb_cur_selector = join(" OR ", concat(
+    ["line_item_resource_id LIKE '%${local.name}%'", "line_item_resource_id LIKE '%${module.efs.id}'"],
+    [for id in module.vpc.natgw_ids : "line_item_resource_id LIKE '%${id}'"],
+    ["resource_tags['user_elbv2_k8s_aws_cluster'] = '${module.eks.cluster_name}'"],
+    [for ng in module.eks.eks_managed_node_groups : "resource_tags['user_eks_nodegroup_name'] = '${split(":", ng.node_group_id)[1]}'"],
+  ))
 }
 
 resource "aws_s3_bucket" "showback" {
@@ -38,15 +52,16 @@ resource "aws_iam_role" "showback_export" {
 }
 
 resource "aws_iam_role_policy" "showback_export" {
-  name = "showback-write"
+  name = "showback-write-cur-read"
   role = aws_iam_role.showback_export.id
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [{
+    Statement = concat(local.cb_cur_read_statements, [{
+      Sid      = "ShowbackWrite"
       Effect   = "Allow"
       Action   = ["s3:PutObject"]
       Resource = "${aws_s3_bucket.showback.arn}/showback/*"
-    }]
+    }])
   })
 }
 
@@ -74,6 +89,8 @@ resource "kubernetes_config_map_v1" "showback_export" {
   data = {
     "showback_export.py" = file("${path.module}/chargeback/showback_export.py")
     "mapping.csv"        = file("${path.module}/chargeback/mapping.csv")
+    "cur_external.sh"    = file("${path.module}/chargeback/cur_external.sh")
+    "cur-selector.sql"   = local.cb_cur_selector
   }
   depends_on = [helm_release.kubecost]
 }
@@ -162,12 +179,59 @@ resource "kubernetes_cron_job_v1" "showback_export" {
             }
 
             init_container {
+              name    = "cur-external"
+              image   = "public.ecr.aws/aws-cli/aws-cli:2.39.7"
+              command = ["/bin/sh", "/config/cur_external.sh"]
+              env {
+                name  = "HOME"
+                value = "/tmp"
+              }
+              env {
+                name  = "AWS_REGION"
+                value = var.aws_region
+              }
+              env {
+                name  = "ATHENA_WORKGROUP"
+                value = aws_athena_workgroup.kubecost.name
+              }
+              env {
+                name  = "CUR_TABLE"
+                value = "${local.cb_glue_database}.${local.cb_athena_table}"
+              }
+              env {
+                name  = "DAYS_BACK"
+                value = tostring(local.cb_export_days)
+              }
+              volume_mount {
+                name       = "config"
+                mount_path = "/config"
+                read_only  = true
+              }
+              volume_mount {
+                name       = "out"
+                mount_path = "/out"
+              }
+              resources {
+                requests = { cpu = "50m", memory = "128Mi" }
+                limits   = { memory = "256Mi" }
+              }
+            }
+
+            init_container {
               name    = "export"
               image   = "public.ecr.aws/docker/library/python:3.13-alpine"
               command = ["python", "/config/showback_export.py"]
               env {
                 name  = "EFS_USAGE_FILE"
                 value = "/out/efs-usage.tsv"
+              }
+              env {
+                name  = "CUR_DIR"
+                value = "/out/cur"
+              }
+              env {
+                name  = "DAYS_BACK"
+                value = tostring(local.cb_export_days)
               }
               env {
                 name  = "KUBECOST_URL"
@@ -191,7 +255,7 @@ resource "kubernetes_cron_job_v1" "showback_export" {
             container {
               name    = "upload"
               image   = "public.ecr.aws/aws-cli/aws-cli:2.39.7"
-              command = ["/bin/sh", "-c", "aws s3 cp /out/ \"s3://${aws_s3_bucket.showback.bucket}/showback/date=$(cat /out/day)/\" --recursive --exclude day"]
+              command = ["/bin/sh", "-c", "aws s3 cp /out/ \"s3://${aws_s3_bucket.showback.bucket}/showback/\" --recursive --exclude '*' --include 'date=*'"]
               env {
                 name  = "HOME"
                 value = "/tmp"
@@ -232,7 +296,7 @@ resource "kubernetes_cron_job_v1" "showback_export" {
 }
 
 output "showback_export_run" {
-  description = "Run the showback export now for a given day (UTC). Results land under showback/date=<day>/."
+  description = "Run the showback export now (last 3 days, UTC). Results land under showback/date=<day>/."
   value       = "kubectl create job -n ${local.cb_kubecost_ns} --from=cronjob/showback-export showback-export-manual-$(date +%s)"
 }
 

@@ -210,42 +210,47 @@ resource "aws_iam_role" "kubecost" {
   tags = local.tags
 }
 
-# Based on Kubecost's published policy for CUR + Athena + Glue + S3, scoped to the lab resources.
+# Read access to CUR through Athena, based on Kubecost's published policy for CUR + Athena + Glue + S3,
+# scoped to the lab resources. Used by Kubecost and by the showback export (chargeback-export.tf).
+locals {
+  cb_cur_read_statements = [
+    {
+      Sid      = "Athena"
+      Effect   = "Allow"
+      Action   = ["athena:StartQueryExecution", "athena:GetQueryExecution", "athena:GetQueryResults", "athena:GetWorkGroup"]
+      Resource = aws_athena_workgroup.kubecost.arn
+    },
+    {
+      Sid    = "Glue"
+      Effect = "Allow"
+      Action = ["glue:GetDatabase", "glue:GetDatabases", "glue:GetTable", "glue:GetTables", "glue:GetPartition", "glue:GetPartitions"]
+      Resource = [
+        "arn:${data.aws_partition.current.partition}:glue:${var.aws_region}:${local.cb_account_id}:catalog",
+        "arn:${data.aws_partition.current.partition}:glue:${var.aws_region}:${local.cb_account_id}:database/${local.cb_glue_database}",
+        "arn:${data.aws_partition.current.partition}:glue:${var.aws_region}:${local.cb_account_id}:table/${local.cb_glue_database}/*",
+      ]
+    },
+    {
+      Sid      = "AthenaResults"
+      Effect   = "Allow"
+      Action   = ["s3:GetObject", "s3:PutObject", "s3:ListBucket", "s3:GetBucketLocation", "s3:AbortMultipartUpload", "s3:ListMultipartUploadParts"]
+      Resource = [aws_s3_bucket.athena_results.arn, "${aws_s3_bucket.athena_results.arn}/*"]
+    },
+    {
+      Sid      = "CurRead"
+      Effect   = "Allow"
+      Action   = ["s3:GetObject", "s3:ListBucket", "s3:GetBucketLocation", "s3:GetBucketAcl"]
+      Resource = [aws_s3_bucket.cur.arn, "${aws_s3_bucket.cur.arn}/*"]
+    },
+  ]
+}
+
 resource "aws_iam_role_policy" "kubecost" {
   name = "cur-athena"
   role = aws_iam_role.kubecost.id
   policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid      = "Athena"
-        Effect   = "Allow"
-        Action   = ["athena:StartQueryExecution", "athena:GetQueryExecution", "athena:GetQueryResults", "athena:GetWorkGroup"]
-        Resource = aws_athena_workgroup.kubecost.arn
-      },
-      {
-        Sid    = "Glue"
-        Effect = "Allow"
-        Action = ["glue:GetDatabase", "glue:GetDatabases", "glue:GetTable", "glue:GetTables", "glue:GetPartition", "glue:GetPartitions"]
-        Resource = [
-          "arn:${data.aws_partition.current.partition}:glue:${var.aws_region}:${local.cb_account_id}:catalog",
-          "arn:${data.aws_partition.current.partition}:glue:${var.aws_region}:${local.cb_account_id}:database/${local.cb_glue_database}",
-          "arn:${data.aws_partition.current.partition}:glue:${var.aws_region}:${local.cb_account_id}:table/${local.cb_glue_database}/*",
-        ]
-      },
-      {
-        Sid      = "AthenaResults"
-        Effect   = "Allow"
-        Action   = ["s3:GetObject", "s3:PutObject", "s3:ListBucket", "s3:GetBucketLocation", "s3:AbortMultipartUpload", "s3:ListMultipartUploadParts"]
-        Resource = [aws_s3_bucket.athena_results.arn, "${aws_s3_bucket.athena_results.arn}/*"]
-      },
-      {
-        Sid      = "CurRead"
-        Effect   = "Allow"
-        Action   = ["s3:GetObject", "s3:ListBucket", "s3:GetBucketLocation", "s3:GetBucketAcl"]
-        Resource = [aws_s3_bucket.cur.arn, "${aws_s3_bucket.cur.arn}/*"]
-      },
-    ]
+    Version   = "2012-10-17"
+    Statement = local.cb_cur_read_statements
   })
 }
 
