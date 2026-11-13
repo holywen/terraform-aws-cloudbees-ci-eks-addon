@@ -1,0 +1,564 @@
+{
+  "uid": "showback-platform",
+  "title": "CloudBees CI showback - platform",
+  "description": "Showback for the platform owner. Source: daily export in S3 (report-by-controller.csv). Figures settle 12-36 h after a day.",
+  "tags": [
+    "showback",
+    "cloudbees-ci"
+  ],
+  "timezone": "utc",
+  "schemaVersion": 39,
+  "editable": true,
+  "time": {
+    "from": "now-7d",
+    "to": "now"
+  },
+  "refresh": "",
+  "templating": {
+    "list": []
+  },
+  "annotations": {
+    "list": []
+  },
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Total cost",
+      "description": "All cost of the cluster in the range, from Kubecost and the AWS bill (CUR).",
+      "datasource": {
+        "type": "grafana-athena-datasource",
+        "uid": "showback-athena"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-athena-datasource",
+            "uid": "showback-athena"
+          },
+          "rawSQL": "SELECT sum(total_cost) FROM report_by_controller WHERE date_parse(day, '%Y-%m-%d') BETWEEN date_trunc('day', $__timeFrom()) AND $__timeTo()",
+          "format": 1,
+          "connectionArgs": {
+            "region": "__default",
+            "catalog": "__default",
+            "database": "__default"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 2,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Teams' own cost",
+      "description": "Compute and storage the controllers and their agents used directly.",
+      "datasource": {
+        "type": "grafana-athena-datasource",
+        "uid": "showback-athena"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-athena-datasource",
+            "uid": "showback-athena"
+          },
+          "rawSQL": "SELECT sum(controller_compute + controller_storage + agent_compute) FROM report_by_controller WHERE date_parse(day, '%Y-%m-%d') BETWEEN date_trunc('day', $__timeFrom()) AND $__timeTo() AND controller_id <> '__unallocated__'",
+          "format": 1,
+          "connectionArgs": {
+            "region": "__default",
+            "catalog": "__default",
+            "database": "__default"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 2,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Shared platform cost",
+      "description": "Operations Center, add-ons, idle node capacity and AWS costs outside Kubernetes, spread over the teams.",
+      "datasource": {
+        "type": "grafana-athena-datasource",
+        "uid": "showback-athena"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-athena-datasource",
+            "uid": "showback-athena"
+          },
+          "rawSQL": "SELECT sum(shared_allocated) FROM report_by_controller WHERE date_parse(day, '%Y-%m-%d') BETWEEN date_trunc('day', $__timeFrom()) AND $__timeTo() AND controller_id <> '__unallocated__'",
+          "format": 1,
+          "connectionArgs": {
+            "region": "__default",
+            "catalog": "__default",
+            "database": "__default"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 2,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Unallocated",
+      "description": "Cost of pods that no mapped controller owns. Should stay near 0%.",
+      "datasource": {
+        "type": "grafana-athena-datasource",
+        "uid": "showback-athena"
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-athena-datasource",
+            "uid": "showback-athena"
+          },
+          "rawSQL": "SELECT 100 * sum(CASE WHEN controller_id = '__unallocated__' THEN total_cost ELSE 0 END) / nullif(sum(total_cost), 0) FROM report_by_controller WHERE date_parse(day, '%Y-%m-%d') BETWEEN date_trunc('day', $__timeFrom()) AND $__timeTo()",
+          "format": 1,
+          "connectionArgs": {
+            "region": "__default",
+            "catalog": "__default",
+            "database": "__default"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 1,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value"
+      }
+    },
+    {
+      "type": "barchart",
+      "title": "Cost per controller",
+      "datasource": {
+        "type": "grafana-athena-datasource",
+        "uid": "showback-athena"
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 10,
+        "x": 0,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-athena-datasource",
+            "uid": "showback-athena"
+          },
+          "rawSQL": "SELECT controller_id, sum(total_cost) AS cost FROM report_by_controller WHERE date_parse(day, '%Y-%m-%d') BETWEEN date_trunc('day', $__timeFrom()) AND $__timeTo() GROUP BY 1 ORDER BY 2 DESC",
+          "format": 1,
+          "connectionArgs": {
+            "region": "__default",
+            "catalog": "__default",
+            "database": "__default"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 2,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#3987e5"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "xField": "controller_id",
+        "showValue": "always",
+        "barWidth": 0.6,
+        "legend": {
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Daily cost by component",
+      "datasource": {
+        "type": "grafana-athena-datasource",
+        "uid": "showback-athena"
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 14,
+        "x": 10,
+        "y": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-athena-datasource",
+            "uid": "showback-athena"
+          },
+          "rawSQL": "SELECT date_parse(day, '%Y-%m-%d') AS time, sum(controller_compute) AS \"Controller compute\", sum(controller_storage) AS \"Controller storage\", sum(agent_compute) AS \"Agents\", sum(shared_allocated) AS \"Shared platform\" FROM report_by_controller WHERE date_parse(day, '%Y-%m-%d') BETWEEN date_trunc('day', $__timeFrom()) AND $__timeTo() AND controller_id <> '__unallocated__' GROUP BY 1 ORDER BY 1",
+          "format": 0,
+          "connectionArgs": {
+            "region": "__default",
+            "catalog": "__default",
+            "database": "__default"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 2,
+          "custom": {
+            "drawStyle": "bars",
+            "barAlignment": 0,
+            "fillOpacity": 90,
+            "lineWidth": 0,
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Controller compute"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#3987e5"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Controller storage"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#d95926"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Agents"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#199e70"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Shared platform"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#c98500"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "type": "table",
+      "title": "Cost per controller and component",
+      "datasource": {
+        "type": "grafana-athena-datasource",
+        "uid": "showback-athena"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 13
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-athena-datasource",
+            "uid": "showback-athena"
+          },
+          "rawSQL": "SELECT controller_id AS controller, team_id AS team, cost_centre, sum(controller_compute) AS controller_compute, sum(controller_storage) AS controller_storage, sum(agent_compute) AS agents, sum(shared_allocated) AS shared_platform, sum(total_cost) AS total, round(100 * sum(total_cost) / sum(sum(total_cost)) OVER (), 1) AS share_pct, count_if(cur_included <> 'True') AS days_without_bill FROM report_by_controller WHERE date_parse(day, '%Y-%m-%d') BETWEEN date_trunc('day', $__timeFrom()) AND $__timeTo() GROUP BY 1, 2, 3 ORDER BY total DESC",
+          "format": 1,
+          "connectionArgs": {
+            "region": "__default",
+            "catalog": "__default",
+            "database": "__default"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 2
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "controller_compute"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "currencyUSD"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "controller_storage"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "currencyUSD"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "agents"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "currencyUSD"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "shared_platform"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "currencyUSD"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "total"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "currencyUSD"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "share_pct"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "days_without_bill"
+            },
+            "properties": [
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "footer": {
+          "show": false
+        }
+      }
+    }
+  ]
+}

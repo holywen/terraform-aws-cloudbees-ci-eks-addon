@@ -285,6 +285,11 @@ def write_controller_reports(out, day, allocated, mapping):
         path = os.path.join(out, f"controller={ctrl}")
         os.makedirs(path, exist_ok=True)
         write_csv(os.path.join(path, "showback.csv"), [r for r in allocated if r["controller_id"] == ctrl])
+    # Same reports under one prefix per table, for Athena/Grafana (a day's folder mixes CSV layouts).
+    for table, name in (("report_by_controller", "report-by-controller.csv"), ("showback_allocated", "showback-allocated.csv")):
+        path = os.path.join(OUT_DIR, "tables", table, f"date={day}")
+        os.makedirs(path, exist_ok=True)
+        shutil.copy(os.path.join(out, name), os.path.join(path, name))
 
 
 def main():

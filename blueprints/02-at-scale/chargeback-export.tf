@@ -255,7 +255,7 @@ resource "kubernetes_cron_job_v1" "showback_export" {
             container {
               name    = "upload"
               image   = "public.ecr.aws/aws-cli/aws-cli:2.39.7"
-              command = ["/bin/sh", "-c", "aws s3 cp /out/ \"s3://${aws_s3_bucket.showback.bucket}/showback/\" --recursive --exclude '*' --include 'date=*'"]
+              command = ["/bin/sh", "-c", "aws s3 cp /out/ \"s3://${aws_s3_bucket.showback.bucket}/showback/\" --recursive --exclude '*' --include 'date=*' --include 'tables/*'"]
               env {
                 name  = "HOME"
                 value = "/tmp"
